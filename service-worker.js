@@ -1,48 +1,32 @@
-const CACHE_NAME = 'money-monitor-cache-v1';
-const urlsToCache = [
-    '/',
-    './index.html',
-    'https://cdn.tailwindcss.com',
-    'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap',
-    'https://unpkg.com/lucide@latest',
-    'https://cdn.jsdelivr.net/npm/chart.js'
+// A version number for your cache
+const CACHE_VERSION = 2;
+const CACHE_NAME = `money-monitor-cache-v${CACHE_VERSION}`;
+
+// The essential files your app needs to function offline
+const APP_SHELL_URLS = [
+    './',
+    './budget-app.html'
 ];
 
-// Install a service worker
+// Install Event: Caches the app shell
 self.addEventListener('install', event => {
-  // Perform install steps
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then(function(cache) {
-        console.log('Opened cache');
-        return cache.addAll(urlsToCache);
+      .then(cache => {
+        console.log('Opened cache and caching app shell');
+        return cache.addAll(APP_SHELL_URLS);
       })
   );
 });
 
-// Cache and return requests
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request)
-      .then(function(response) {
-        // Cache hit - return response
-        if (response) {
-          return response;
-        }
-        return fetch(event.request);
-      }
-    )
-  );
-});
-
-// Update a service worker
+// Activate Event: Cleans up old caches
 self.addEventListener('activate', event => {
-  const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cacheName => {
-          if (cacheWhitelist.indexOf(cacheName) === -1) {
+          if (cacheName !== CACHE_NAME) {
+            console.log('Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
@@ -50,3 +34,35 @@ self.addEventListener('activate', event => {
     })
   );
 });
+
+// Fetch Event: Serves content from cache, falling back to network
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    caches.match(event.request)
+      .then(cachedResponse => {
+        // If the response is in the cache, return it
+        if (cachedResponse) {
+          return cachedResponse;
+        }
+
+        // If it's not in the cache, fetch it from the network
+        return fetch(event.request).then(
+          networkResponse => {
+            // After fetching, add the response to the cache for next time
+            return caches.open(CACHE_NAME).then(cache => {
+              // We can only cache GET requests
+              if (event.request.method === 'GET') {
+                 cache.put(event.request, networkResponse.clone());
+              }
+              return networkResponse;
+            });
+          }
+        ).catch(error => {
+            // Handle network errors for offline fallback if needed
+            console.error('Fetch failed:', error);
+            // You could return an offline fallback page here if you had one
+        });
+      })
+  );
+});
+
