@@ -1,11 +1,13 @@
 // A version number for your cache
-const CACHE_VERSION = 2;
+const CACHE_VERSION = 4; // Incremented version to ensure update
 const CACHE_NAME = `money-monitor-cache-v${CACHE_VERSION}`;
 
 // The essential files your app needs to function offline
 const APP_SHELL_URLS = [
-    './',
-    './budget-app.html'
+    './index.html',
+    './manifest.json',
+    './icons/icon-192x192.jpg',
+    './icons/icon-512x512.jpg'
 ];
 
 // Install Event: Caches the app shell
@@ -52,7 +54,7 @@ self.addEventListener('fetch', event => {
             return caches.open(CACHE_NAME).then(cache => {
               // We can only cache GET requests
               if (event.request.method === 'GET') {
-                 cache.put(event.request, networkResponse.clone());
+                 cache.put(event.request, network-response.clone());
               }
               return networkResponse;
             });
