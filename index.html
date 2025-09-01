@@ -17,6 +17,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
 
     <style>
         body {
@@ -37,24 +38,30 @@
     <div class="max-w-3xl mx-auto bg-gray-900 text-white min-h-screen flex flex-col shadow-2xl">
 
         <!-- Side Menu -->
-        <div id="side-menu" class="fixed top-0 left-0 h-full w-72 bg-gray-800 shadow-lg z-50 p-6 transform -translate-x-full border-r border-gray-700">
+        <div id="side-menu" class="fixed top-0 left-0 h-full w-72 bg-gray-800 shadow-lg z-50 p-6 transform -translate-x-full border-r border-gray-700 flex flex-col">
             <div class="flex justify-between items-center mb-10">
                 <h2 class="text-xl font-bold">Menu</h2>
                 <button id="close-menu-btn" class="text-gray-400 hover:text-white"><i data-lucide="x" class="w-6 h-6"></i></button>
             </div>
-            <nav class="space-y-4">
+            <nav class="space-y-4 flex-1">
                 <button id="add-income-menu-btn" class="w-full flex items-center gap-3 p-3 rounded-lg bg-blue-600 hover:bg-blue-700 font-semibold"><i data-lucide="plus-circle" class="w-5 h-5"></i><span>Add Income</span></button>
                 <button id="add-bill-menu-btn" class="w-full flex items-center gap-3 p-3 rounded-lg bg-yellow-600 hover:bg-yellow-700 font-semibold"><i data-lucide="receipt" class="w-5 h-5"></i><span>Add Bill</span></button>
                 <button id="add-debt-menu-btn" class="w-full flex items-center gap-3 p-3 rounded-lg bg-red-600 hover:bg-red-700 font-semibold"><i data-lucide="credit-card" class="w-5 h-5"></i><span>Add Debt</span></button>
-                <button id="copy-month-btn" class="w-full flex items-center gap-3 p-3 rounded-lg bg-green-600 hover:bg-green-700 font-semibold mt-6 border-t border-gray-700 pt-6"><i data-lucide="copy-plus" class="w-5 h-5"></i><span>Copy Month's Bills</span></button>
+                
+                <div class="pt-6 border-t border-gray-700">
+                     <button id="copy-month-btn" class="w-full flex items-center gap-3 p-3 rounded-lg bg-green-600 hover:bg-green-700 font-semibold mb-4"><i data-lucide="copy-plus" class="w-5 h-5"></i><span>Copy Month's Bills</span></button>
+                     <label for="csv-importer" class="w-full flex items-center gap-3 p-3 rounded-lg bg-indigo-600 hover:bg-indigo-700 font-semibold cursor-pointer"><i data-lucide="upload" class="w-5 h-5"></i><span>Import CSV</span></label>
+                     <input type="file" id="csv-importer" class="hidden" accept=".csv">
+                </div>
             </nav>
-            <div class="absolute bottom-6 left-6 right-6">
+            <div class="mt-auto">
                 <label class="text-sm text-gray-400">Current Month</label>
                 <div class="mt-2 p-3 bg-gray-700 rounded-lg font-semibold" id="start-month-display"></div>
             </div>
         </div>
         <div id="menu-overlay" class="fixed inset-0 bg-black/50 z-40 hidden"></div>
 
+        <!-- ... rest of the HTML ... -->
         <!-- Quick Overview View -->
         <main id="overview-view" class="flex-1 flex flex-col hidden">
             <header class="flex-shrink-0 flex items-center justify-between p-4 sm:p-6 border-b border-gray-700/50">
@@ -136,12 +143,10 @@
             </div>
             <form id="copy-month-form">
                 <p class="text-gray-400 text-sm mb-4">Select months to copy transactions from <span id="copy-source-month" class="font-semibold text-white"></span>.</p>
-                
                 <div class="mb-4">
                     <label for="years-to-copy-input" class="block text-sm font-medium text-gray-300 mb-1">Number of years to copy forward</label>
                     <input type="number" id="years-to-copy-input" name="years" value="1" min="1" max="10" class="w-full bg-gray-700 border-gray-600 text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500">
                 </div>
-
                 <div id="months-checkbox-list" class="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-48 overflow-y-auto custom-scrollbar pr-2"></div>
                 <div class="mt-4">
                     <label class="flex items-center space-x-2 text-sm text-gray-300 cursor-pointer">
@@ -154,6 +159,17 @@
                     <button type="submit" class="px-6 py-2 rounded-lg bg-green-600 hover:bg-green-700">Copy</button>
                 </div>
             </form>
+        </div>
+    </div>
+    <div id="csv-confirmation-modal" class="modal fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50 hidden opacity-0">
+        <div class="bg-gray-800 w-full max-w-lg rounded-2xl shadow-xl p-6 border border-gray-700">
+            <h2 class="text-xl font-bold text-white mb-4">Confirm Import</h2>
+            <p class="text-gray-400 mb-4">Found <strong id="csv-record-count" class="text-white">0</strong> transactions. Do you want to import them?</p>
+            <div class="max-h-60 overflow-y-auto custom-scrollbar p-2 bg-gray-900 rounded-lg mb-4" id="csv-preview-list"></div>
+            <div class="flex justify-end gap-3 pt-4">
+                <button type="button" id="cancel-csv-import-btn" class="px-6 py-2 rounded-lg bg-gray-600 hover:bg-gray-500">Cancel</button>
+                <button type="button" id="confirm-csv-import-btn" class="px-6 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700">Import</button>
+            </div>
         </div>
     </div>
     <div id="toast" class="fixed bottom-24 sm:bottom-10 right-10 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-20 opacity-0"></div>
@@ -177,6 +193,7 @@
             let currentDate = new Date(); currentDate.setDate(1);
             let summaryYear = new Date().getFullYear();
             let yearlyChart = null;
+            let transactionsToImport = [];
 
             const saveData = () => {
                 localStorage.setItem('transactions', JSON.stringify(transactions));
@@ -184,6 +201,102 @@
             };
 
             // --- DOM ELEMENTS ---
+            const csvImporter = document.getElementById('csv-importer');
+            const csvConfirmationModal = document.getElementById('csv-confirmation-modal');
+
+            // --- CSV IMPORT LOGIC ---
+            const handleCsvImport = (event) => {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                Papa.parse(file, {
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: (results) => {
+                        transactionsToImport = [];
+                        const potentialHeaders = {
+                            date: ['Date', 'Transaction Date'],
+                            description: ['Transaction', 'Description', 'Name'],
+                            amount: ['Amount', 'Price']
+                        };
+
+                        const findHeader = (row, options) => {
+                            for (const option of options) {
+                                if (row.hasOwnProperty(option)) return option;
+                            }
+                            return null;
+                        };
+                        
+                        const firstRow = results.data[0];
+                        const dateHeader = findHeader(firstRow, potentialHeaders.date);
+                        const descriptionHeader = findHeader(firstRow, potentialHeaders.description);
+                        const amountHeader = findHeader(firstRow, potentialHeaders.amount);
+
+                        if (!dateHeader || !descriptionHeader || !amountHeader) {
+                            showToast('CSV headers not recognized. Expected Date, Transaction, Amount.', 'error');
+                            return;
+                        }
+
+                        results.data.forEach(row => {
+                            const date = new Date(row[dateHeader]);
+                            const amount = parseFloat(row[amountHeader]);
+                            const description = row[descriptionHeader].trim();
+
+                            if (isNaN(date.getTime()) || isNaN(amount) || !description) return;
+                            
+                            const transactionType = amount > 0 ? 'income' : 'bill';
+                            const finalAmount = Math.abs(amount);
+
+                            transactionsToImport.push({
+                                date: date.toISOString().split('T')[0],
+                                description: description,
+                                amount: finalAmount,
+                                type: transactionType,
+                                category: 'other',
+                                status: transactionType === 'income' ? 'paid' : 'unpaid'
+                            });
+                        });
+                        
+                        displayCsvConfirmation(transactionsToImport);
+                    }
+                });
+                event.target.value = ''; // Reset file input
+            };
+
+            const displayCsvConfirmation = (records) => {
+                if(records.length === 0) {
+                    showToast('No valid transactions found in CSV file.', 'error');
+                    return;
+                }
+
+                document.getElementById('csv-record-count').textContent = records.length;
+                const previewList = document.getElementById('csv-preview-list');
+                previewList.innerHTML = records.slice(0, 10).map(r => `
+                    <div class="text-xs text-gray-400 p-1 grid grid-cols-3 gap-2">
+                        <span>${r.date}</span>
+                        <span class="truncate">${r.description}</span>
+                        <span class="font-mono text-right ${r.type === 'income' ? 'text-green-400' : 'text-red-400'}">${formatCurrency(r.amount)}</span>
+                    </div>
+                `).join('');
+
+                toggleModal(csvConfirmationModal, true);
+            };
+
+            const confirmCsvImport = () => {
+                const newTransactions = transactionsToImport.map(t => ({...t, id: Date.now() + Math.random() }));
+                transactions.push(...newTransactions);
+                saveData();
+                showToast(`${newTransactions.length} transactions imported successfully!`);
+                toggleModal(csvConfirmationModal, false);
+                renderMonthlyTransactions();
+            };
+
+            csvImporter.addEventListener('change', handleCsvImport);
+            document.getElementById('confirm-csv-import-btn').addEventListener('click', confirmCsvImport);
+            document.getElementById('cancel-csv-import-btn').addEventListener('click', () => toggleModal(csvConfirmationModal, false));
+            
+            // --- ALL OTHER JS ---
+            // ... (The rest of the JS for menu, views, modals, rendering, etc. is unchanged and goes here)
             const sideMenu = document.getElementById('side-menu');
             const menuOverlay = document.getElementById('menu-overlay');
             const closeMenuBtn = document.getElementById('close-menu-btn');
@@ -196,228 +309,22 @@
             const yearlyViewBtn = document.getElementById('yearly-view-btn');
             const transactionsList = document.getElementById('transactions-list');
             
-            // --- MENU LOGIC ---
-            const toggleMenu = (open) => {
-                if (open) { sideMenu.classList.add('open'); menuOverlay.classList.remove('hidden'); } 
-                else { sideMenu.classList.remove('open'); menuOverlay.classList.add('hidden'); }
-            };
-
-            // --- VIEW MANAGEMENT ---
-            const setActiveView = (viewName) => {
-                const views = { overview: overviewView, monthly: monthlyView, yearly: yearlyView };
-                const buttons = { overview: overviewViewBtn, monthly: monthlyViewBtn, yearly: yearlyViewBtn };
-                for (const key in views) {
-                    views[key].classList.toggle('hidden', key !== viewName);
-                    buttons[key].classList.toggle('text-blue-400', key === viewName);
-                    buttons[key].classList.toggle('font-semibold', key === viewName);
-                    buttons[key].classList.toggle('text-gray-400', key !== viewName);
-                }
-                if (viewName === 'yearly') renderYearlySummary();
-                else if (viewName === 'monthly') renderMonthlyTransactions();
-                lucide.createIcons();
-            };
-
-            // --- HELPER FUNCTIONS ---
+            const toggleMenu = (open) => { if (open) { sideMenu.classList.add('open'); menuOverlay.classList.remove('hidden'); } else { sideMenu.classList.remove('open'); menuOverlay.classList.add('hidden'); } };
+            const setActiveView = (viewName) => { const views = { overview: overviewView, monthly: monthlyView, yearly: yearlyView }; const buttons = { overview: overviewViewBtn, monthly: monthlyViewBtn, yearly: yearlyViewBtn }; for (const key in views) { views[key].classList.toggle('hidden', key !== viewName); buttons[key].classList.toggle('text-blue-400', key === viewName); buttons[key].classList.toggle('font-semibold', key === viewName); buttons[key].classList.toggle('text-gray-400', key !== viewName); } if (viewName === 'yearly') renderYearlySummary(); else if (viewName === 'monthly') renderMonthlyTransactions(); lucide.createIcons(); };
             const formatCurrency = (amount) => `$${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-            const showToast = (message, type = 'success') => {
-                const toast = document.getElementById('toast');
-                toast.textContent = message;
-                toast.className = `fixed bottom-24 sm:bottom-10 right-10 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-20 opacity-0 ${type === 'success' ? 'bg-green-600' : 'bg-red-600'}`;
-                setTimeout(() => toast.classList.remove('translate-y-20', 'opacity-0'), 10);
-                setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
-            };
-            const toggleModal = (modalElement, open) => {
-                if(open) {
-                    modalElement.classList.remove('hidden');
-                    setTimeout(() => modalElement.classList.remove('opacity-0'), 10);
-                } else {
-                    modalElement.classList.add('opacity-0');
-                    setTimeout(() => modalElement.classList.add('hidden'), 300);
-                }
-            };
+            const showToast = (message, type = 'success') => { const toast = document.getElementById('toast'); toast.textContent = message; toast.className = `fixed bottom-24 sm:bottom-10 right-10 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-20 opacity-0 ${type === 'success' ? 'bg-green-600' : 'bg-red-600'}`; setTimeout(() => toast.classList.remove('translate-y-20', 'opacity-0'), 10); setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000); };
+            const toggleModal = (modalElement, open) => { if(open) { modalElement.classList.remove('hidden'); setTimeout(() => modalElement.classList.remove('opacity-0'), 10); } else { modalElement.classList.add('opacity-0'); setTimeout(() => modalElement.classList.add('hidden'), 300); } };
+            const renderMonthlyTransactions = () => { transactionsList.innerHTML = ''; document.getElementById('current-month-header').textContent = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(currentDate); document.getElementById('start-month-display').textContent = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(currentDate); const currentMonthTransactions = transactions.filter(t => new Date(t.date + 'T00:00:00').getFullYear() === currentDate.getFullYear() && new Date(t.date + 'T00:00:00').getMonth() === currentDate.getMonth()).sort((a,b) => new Date(a.date) - new Date(b.date)); if (currentMonthTransactions.length === 0) { transactionsList.innerHTML = `<div class="text-center py-16 bg-gray-800 rounded-lg"><i data-lucide="wind" class="w-12 h-12 mx-auto text-gray-500 mb-4"></i><h3 class="text-lg font-semibold text-gray-300">Nothing here yet</h3><p class="text-gray-400">Add an income, bill, or debt to get started.</p></div>`; lucide.createIcons(); return; } let grandTotalBills = 0; const transactionGroups = { income: [], essential: [], subscription: [], discretionary: [], other: [] }; currentMonthTransactions.forEach(t => { if (t.type === 'income') { transactionGroups.income.push(t); } else { (transactionGroups[t.category] || transactionGroups.other).push(t); grandTotalBills += t.amount; } }); const categoryTitles = { income: 'Income', essential: 'Essential Living Expenses', subscription: 'Subscriptions & Memberships', discretionary: 'Discretionary Spending', other: 'Other Bills & Debts' }; const createTransactionElement = (t) => { const statusStyles = { paid: { text: 'Paid', bg: 'bg-green-500/20', textClr: 'text-green-400' }, unpaid: { text: 'Unpaid', bg: 'bg-gray-500/20', textClr: 'text-gray-300' }, 'due-soon': { text: 'Due Soon', bg: 'bg-red-500/20', textClr: 'text-red-400' } }; const typeIcons = { bill: 'receipt', debt: 'credit-card', income: 'trending-up' }; const status = statusStyles[t.status] || statusStyles['unpaid']; const formatDate = (ds) => new Date(ds + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); return `<div class="group bg-gray-800 rounded-lg p-4 flex items-center justify-between transition-all hover:bg-gray-700/50 relative"><div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"><button data-id="${t.id}" class="edit-btn p-1.5 hover:bg-gray-600 rounded-md"><i data-lucide="pencil" class="w-4 h-4 text-gray-400 pointer-events-none"></i></button></div><div class="flex items-center gap-4"><div class="p-3 bg-gray-700 rounded-full"><i data-lucide="${typeIcons[t.type]}" class="w-5 h-5"></i></div><div><p class="font-semibold">${t.description}</p><p class="text-sm text-gray-400">Due ${formatDate(t.date)}</p></div></div><div class="text-right"><p class="font-bold text-lg ${t.type === 'income' ? 'text-green-400' : 'text-white'}">${formatCurrency(t.amount)}</p>${t.type !== 'income' ? `<button data-id="${t.id}" class="toggle-paid-btn text-xs font-semibold px-2 py-1 rounded-full mt-1 ${status.bg} ${status.textClr} transition-colors hover:opacity-80">${status.text}</button>` : ''}</div></div>`; }; for (const key in categoryTitles) { if (transactionGroups[key] && transactionGroups[key].length > 0) { const isCollapsed = collapsedCategories[key] || false; const categoryTotal = transactionGroups[key].reduce((sum, t) => sum + t.amount, 0); transactionsList.innerHTML += `<div class="mt-4"><div class="category-header cursor-pointer flex justify-between items-center p-2 rounded-md hover:bg-gray-700/50" data-category-key="${key}"><div class="flex items-center gap-2"><i data-lucide="chevron-down" class="w-5 h-5 ${isCollapsed ? '-rotate-90' : ''}"></i><h3 class="font-bold text-lg text-gray-300">${categoryTitles[key]}</h3></div><span class="font-semibold ${key === 'income' ? 'text-green-400' : 'text-white'}">${formatCurrency(categoryTotal)}</span></div><div class="pl-5 space-y-2 mt-2 ${isCollapsed ? 'hidden' : ''}">${transactionGroups[key].map(createTransactionElement).join('')}</div></div>`; } } transactionsList.innerHTML += `<div class="mt-8 p-4 bg-blue-900/50 rounded-lg flex justify-between items-center border border-blue-800"><span class="font-bold text-lg text-blue-300">Month's Total Bills:</span><span class="font-bold text-xl text-white">${formatCurrency(grandTotalBills)}</span></div>`; lucide.createIcons(); };
+            const renderYearlySummary = () => { document.getElementById('yearly-header').textContent = `Summary for ${summaryYear}`; const yearlyTransactions = transactions.filter(t => new Date(t.date + 'T00:00:00').getFullYear() === summaryYear); let totalIncome = 0; let totalExpenses = 0; const monthlyData = Array(12).fill(0).map(() => ({ income: 0, expenses: 0 })); yearlyTransactions.forEach(t => { const month = new Date(t.date + 'T00:00:00').getMonth(); if (t.type === 'income') { totalIncome += t.amount; monthlyData[month].income += t.amount; } else { totalExpenses += t.amount; monthlyData[month].expenses += t.amount; } }); const netSavings = totalIncome - totalExpenses; document.getElementById('total-income').textContent = formatCurrency(totalIncome); document.getElementById('total-expenses').textContent = formatCurrency(totalExpenses); const netSavingsEl = document.getElementById('net-savings'); netSavingsEl.textContent = formatCurrency(netSavings); netSavingsEl.className = `text-2xl font-bold ${netSavings < 0 ? 'text-red-400' : 'text-green-400'}`; renderYearlyChart(monthlyData); renderMonthlyBreakdown(monthlyData); };
+            const renderYearlyChart = (monthlyData) => { const ctx = document.getElementById('yearly-chart').getContext('2d'); if (yearlyChart) yearlyChart.destroy(); yearlyChart = new Chart(ctx, { type: 'bar', data: { labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'], datasets: [ { label: 'Income', data: monthlyData.map(m => m.income), backgroundColor: 'rgba(59, 130, 246, 0.7)' }, { label: 'Expenses', data: monthlyData.map(m => m.expenses), backgroundColor: 'rgba(239, 68, 68, 0.7)' } ] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#d1d5db' } } }, scales: { y: { ticks: { color: '#9ca3af' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } }, x: { ticks: { color: '#9ca3af' }, grid: { display: false } } } } }); };
+            const renderMonthlyBreakdown = (monthlyData) => { const breakdownList = document.getElementById('monthly-breakdown-list'); breakdownList.innerHTML = ''; const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]; let hasData = false; monthlyData.forEach((data, index) => { if (data.income > 0 || data.expenses > 0) { hasData = true; const net = data.income - data.expenses; breakdownList.innerHTML += `<div class="bg-gray-800 p-3 rounded-lg grid grid-cols-3 items-center gap-4 text-sm"><strong class="text-white col-span-1">${monthNames[index]}</strong><div class="col-span-2 grid grid-cols-3 gap-2 text-right"><span class="text-green-400">${formatCurrency(data.income)}</span><span class="text-red-400">${formatCurrency(data.expenses)}</span><span class="font-semibold ${net >= 0 ? 'text-green-400' : 'text-red-400'}">${formatCurrency(net)}</span></div></div>`; } }); if (!hasData) { breakdownList.innerHTML = `<div class="text-center py-8 text-gray-500">No data for ${summaryYear}</div>` } else { breakdownList.insertAdjacentHTML('afterbegin', `<div class="p-3 rounded-lg grid grid-cols-3 items-center gap-4 text-xs font-bold text-gray-400"><span class="col-span-1">Month</span><div class="col-span-2 grid grid-cols-3 gap-2 text-right"><span>Income</span><span>Expenses</span><span>Net</span></div></div>`); } };
+            const openTransactionModal = (type = 'bill', transactionId = null) => { const form = document.getElementById('transaction-form'); form.reset(); const modalTitle = document.getElementById('modal-title'); const saveBtn = document.getElementById('save-btn'); const deleteBtn = document.getElementById('delete-btn'); const idField = document.getElementById('transaction-id'); const typeSelect = document.getElementById('transaction-type'); const descInput = document.getElementById('transaction-description'); const amountInput = document.getElementById('transaction-amount'); const dateInput = document.getElementById('transaction-date'); const catContainer = document.getElementById('category-container'); const catSelect = document.getElementById('transaction-category'); if (transactionId) { const t = transactions.find(t => t.id == transactionId); if (!t) return; modalTitle.textContent = 'Edit Transaction'; saveBtn.textContent = 'Update'; deleteBtn.classList.remove('hidden'); idField.value = t.id; typeSelect.value = t.type; descInput.value = t.description; amountInput.value = t.amount; dateInput.value = t.date; catContainer.classList.toggle('hidden', t.type === 'income'); if (t.type !== 'income') catSelect.value = t.category || 'other'; } else { modalTitle.textContent = `Add ${type.charAt(0).toUpperCase() + type.slice(1)}`; saveBtn.textContent = 'Save'; deleteBtn.classList.add('hidden'); idField.value = ''; typeSelect.value = type; catContainer.classList.toggle('hidden', type === 'income'); const today = new Date(); today.setFullYear(currentDate.getFullYear()); today.setMonth(currentDate.getMonth()); dateInput.value = today.toISOString().split('T')[0]; } toggleModal(document.getElementById('add-transaction-modal'), true); };
+            const handleFormSubmit = (e) => { e.preventDefault(); const formData = new FormData(e.target); const id = formData.get('id'); const type = formData.get('type'); const transactionData = { type: type, description: formData.get('description'), amount: parseFloat(formData.get('amount')), date: formData.get('date'), category: type === 'income' ? null : formData.get('category') }; if (id) { const index = transactions.findIndex(t => t.id == id); if (index !== -1) transactions[index] = { ...transactions[index], ...transactionData }; showToast('Transaction updated!'); } else { transactions.push({ ...transactionData, id: Date.now(), status: type === 'income' ? 'paid' : 'unpaid' }); showToast('Transaction added!'); } saveData(); renderMonthlyTransactions(); toggleModal(document.getElementById('add-transaction-modal'), false); };
+            const handleDelete = () => { const id = document.getElementById('transaction-id').value; if (!id) return; transactions = transactions.filter(t => t.id != id); saveData(); renderMonthlyTransactions(); toggleModal(document.getElementById('add-transaction-modal'), false); showToast('Transaction deleted!', 'error'); };
+            const handleListClick = (e) => { const header = e.target.closest('.category-header'); const editBtn = e.target.closest('.edit-btn'); const paidBtn = e.target.closest('.toggle-paid-btn'); if (header) { const categoryKey = header.dataset.categoryKey; collapsedCategories[categoryKey] = !collapsedCategories[categoryKey]; saveData(); renderMonthlyTransactions(); } else if (editBtn) { openTransactionModal(null, editBtn.dataset.id); } else if (paidBtn) { const transaction = transactions.find(t => t.id == paidBtn.dataset.id); if (transaction) { transaction.status = transaction.status === 'paid' ? 'unpaid' : 'paid'; saveData(); renderMonthlyTransactions(); } } };
+            const populateMonthsCheckboxes = () => { const monthsCheckboxList = document.getElementById('months-checkbox-list'); document.getElementById('copy-source-month').textContent = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(currentDate); monthsCheckboxList.innerHTML = ''; const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]; monthNames.forEach((month, index) => { monthsCheckboxList.innerHTML += `<label class="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-700 cursor-pointer text-gray-300"><input type="checkbox" value="${index}" class="month-checkbox rounded bg-gray-600 border-gray-500 text-blue-500 focus:ring-blue-600"><span>${month}</span></label>`; }); };
+            const handleCopyMonthSubmit = (e) => { e.preventDefault(); const yearsToCopy = parseInt(document.getElementById('years-to-copy-input').value, 10) || 1; const sourceMonth = currentDate.getMonth(); const sourceYear = currentDate.getFullYear(); const sourceTransactions = transactions.filter(t => new Date(t.date + 'T00:00:00').getMonth() === sourceMonth && new Date(t.date + 'T00:00:00').getFullYear() === sourceYear); if (sourceTransactions.length === 0) { showToast("No transactions in the current month to copy.", 'error'); return; } const targetMonths = Array.from(document.querySelectorAll('.month-checkbox:checked')).map(cb => parseInt(cb.value)); if (targetMonths.length === 0) { showToast("Please select at least one month to copy to.", 'error'); return; } let newTransactions = []; for (let i = 0; i < yearsToCopy; i++) { const currentTargetYear = sourceYear + i; targetMonths.forEach(monthIndex => { if (currentTargetYear === sourceYear && monthIndex <= sourceMonth) { return; } sourceTransactions.forEach(t => { const sourceDate = new Date(t.date + 'T00:00:00'); let targetDate = new Date(currentTargetYear, monthIndex, sourceDate.getDate()); if (targetDate.getMonth() !== monthIndex) { targetDate = new Date(currentTargetYear, monthIndex + 1, 0); } const alreadyExists = transactions.some(et => new Date(et.date + 'T00:00:00').getTime() === targetDate.getTime() && et.description === t.description && et.amount === t.amount); if (!alreadyExists) { newTransactions.push({ ...t, id: Date.now() + Math.random(), date: targetDate.toISOString().split('T')[0], status: t.type === 'income' ? 'paid' : 'unpaid' }); } }); }); } if (newTransactions.length > 0) { transactions.push(...newTransactions); saveData(); showToast(`${newTransactions.length} transaction(s) copied!`); } else { showToast("No new transactions were copied (they may already exist).", 'error'); } toggleModal(document.getElementById('copy-month-modal'), false); };
             
-            // --- RENDER FUNCTIONS ---
-            const renderMonthlyTransactions = () => {
-                transactionsList.innerHTML = '';
-                document.getElementById('current-month-header').textContent = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(currentDate);
-                document.getElementById('start-month-display').textContent = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(currentDate);
-                const currentMonthTransactions = transactions.filter(t => new Date(t.date + 'T00:00:00').getFullYear() === currentDate.getFullYear() && new Date(t.date + 'T00:00:00').getMonth() === currentDate.getMonth()).sort((a,b) => new Date(a.date) - new Date(b.date));
-                if (currentMonthTransactions.length === 0) {
-                    transactionsList.innerHTML = `<div class="text-center py-16 bg-gray-800 rounded-lg"><i data-lucide="wind" class="w-12 h-12 mx-auto text-gray-500 mb-4"></i><h3 class="text-lg font-semibold text-gray-300">Nothing here yet</h3><p class="text-gray-400">Add an income, bill, or debt to get started.</p></div>`;
-                    lucide.createIcons(); return;
-                }
-                let grandTotalBills = 0;
-                const transactionGroups = { income: [], essential: [], subscription: [], discretionary: [], other: [] };
-                currentMonthTransactions.forEach(t => { if (t.type === 'income') { transactionGroups.income.push(t); } else { (transactionGroups[t.category] || transactionGroups.other).push(t); grandTotalBills += t.amount; } });
-                const categoryTitles = { income: 'Income', essential: 'Essential Living Expenses', subscription: 'Subscriptions & Memberships', discretionary: 'Discretionary Spending', other: 'Other Bills & Debts' };
-                const createTransactionElement = (t) => {
-                    const statusStyles = { paid: { text: 'Paid', bg: 'bg-green-500/20', textClr: 'text-green-400' }, unpaid: { text: 'Unpaid', bg: 'bg-gray-500/20', textClr: 'text-gray-300' }, 'due-soon': { text: 'Due Soon', bg: 'bg-red-500/20', textClr: 'text-red-400' } };
-                    const typeIcons = { bill: 'receipt', debt: 'credit-card', income: 'trending-up' };
-                    const status = statusStyles[t.status] || statusStyles['unpaid'];
-                    const formatDate = (ds) => new Date(ds + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                    return `<div class="group bg-gray-800 rounded-lg p-4 flex items-center justify-between transition-all hover:bg-gray-700/50 relative"><div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"><button data-id="${t.id}" class="edit-btn p-1.5 hover:bg-gray-600 rounded-md"><i data-lucide="pencil" class="w-4 h-4 text-gray-400 pointer-events-none"></i></button></div><div class="flex items-center gap-4"><div class="p-3 bg-gray-700 rounded-full"><i data-lucide="${typeIcons[t.type]}" class="w-5 h-5"></i></div><div><p class="font-semibold">${t.description}</p><p class="text-sm text-gray-400">Due ${formatDate(t.date)}</p></div></div><div class="text-right"><p class="font-bold text-lg ${t.type === 'income' ? 'text-green-400' : 'text-white'}">${formatCurrency(t.amount)}</p>${t.type !== 'income' ? `<button data-id="${t.id}" class="toggle-paid-btn text-xs font-semibold px-2 py-1 rounded-full mt-1 ${status.bg} ${status.textClr} transition-colors hover:opacity-80">${status.text}</button>` : ''}</div></div>`;
-                };
-                for (const key in categoryTitles) {
-                    if (transactionGroups[key] && transactionGroups[key].length > 0) {
-                        const isCollapsed = collapsedCategories[key] || false;
-                        const categoryTotal = transactionGroups[key].reduce((sum, t) => sum + t.amount, 0);
-                        transactionsList.innerHTML += `<div class="mt-4"><div class="category-header cursor-pointer flex justify-between items-center p-2 rounded-md hover:bg-gray-700/50" data-category-key="${key}"><div class="flex items-center gap-2"><i data-lucide="chevron-down" class="w-5 h-5 ${isCollapsed ? '-rotate-90' : ''}"></i><h3 class="font-bold text-lg text-gray-300">${categoryTitles[key]}</h3></div><span class="font-semibold ${key === 'income' ? 'text-green-400' : 'text-white'}">${formatCurrency(categoryTotal)}</span></div><div class="pl-5 space-y-2 mt-2 ${isCollapsed ? 'hidden' : ''}">${transactionGroups[key].map(createTransactionElement).join('')}</div></div>`;
-                    }
-                }
-                transactionsList.innerHTML += `<div class="mt-8 p-4 bg-blue-900/50 rounded-lg flex justify-between items-center border border-blue-800"><span class="font-bold text-lg text-blue-300">Month's Total Bills:</span><span class="font-bold text-xl text-white">${formatCurrency(grandTotalBills)}</span></div>`;
-                lucide.createIcons();
-            };
-            const renderYearlySummary = () => {
-                document.getElementById('yearly-header').textContent = `Summary for ${summaryYear}`;
-                const yearlyTransactions = transactions.filter(t => new Date(t.date + 'T00:00:00').getFullYear() === summaryYear);
-                let totalIncome = 0;
-                let totalExpenses = 0;
-                const monthlyData = Array(12).fill(0).map(() => ({ income: 0, expenses: 0 }));
-                yearlyTransactions.forEach(t => {
-                    const month = new Date(t.date + 'T00:00:00').getMonth();
-                    if (t.type === 'income') {
-                        totalIncome += t.amount;
-                        monthlyData[month].income += t.amount;
-                    } else {
-                        totalExpenses += t.amount;
-                        monthlyData[month].expenses += t.amount;
-                    }
-                });
-                const netSavings = totalIncome - totalExpenses;
-                document.getElementById('total-income').textContent = formatCurrency(totalIncome);
-                document.getElementById('total-expenses').textContent = formatCurrency(totalExpenses);
-                const netSavingsEl = document.getElementById('net-savings');
-                netSavingsEl.textContent = formatCurrency(netSavings);
-                netSavingsEl.className = `text-2xl font-bold ${netSavings < 0 ? 'text-red-400' : 'text-green-400'}`;
-                renderYearlyChart(monthlyData);
-                renderMonthlyBreakdown(monthlyData);
-            };
-            const renderYearlyChart = (monthlyData) => {
-                const ctx = document.getElementById('yearly-chart').getContext('2d');
-                if (yearlyChart) yearlyChart.destroy();
-                yearlyChart = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                        datasets: [
-                            { label: 'Income', data: monthlyData.map(m => m.income), backgroundColor: 'rgba(59, 130, 246, 0.7)' },
-                            { label: 'Expenses', data: monthlyData.map(m => m.expenses), backgroundColor: 'rgba(239, 68, 68, 0.7)' }
-                        ]
-                    },
-                    options: {
-                        responsive: true, maintainAspectRatio: false,
-                        plugins: { legend: { labels: { color: '#d1d5db' } } },
-                        scales: { y: { ticks: { color: '#9ca3af' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } }, x: { ticks: { color: '#9ca3af' }, grid: { display: false } } }
-                    }
-                });
-            };
-            const renderMonthlyBreakdown = (monthlyData) => {
-                const breakdownList = document.getElementById('monthly-breakdown-list');
-                breakdownList.innerHTML = '';
-                const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-                let hasData = false;
-                monthlyData.forEach((data, index) => {
-                    if (data.income > 0 || data.expenses > 0) {
-                        hasData = true;
-                        const net = data.income - data.expenses;
-                        breakdownList.innerHTML += `<div class="bg-gray-800 p-3 rounded-lg grid grid-cols-3 items-center gap-4 text-sm"><strong class="text-white col-span-1">${monthNames[index]}</strong><div class="col-span-2 grid grid-cols-3 gap-2 text-right"><span class="text-green-400">${formatCurrency(data.income)}</span><span class="text-red-400">${formatCurrency(data.expenses)}</span><span class="font-semibold ${net >= 0 ? 'text-green-400' : 'text-red-400'}">${formatCurrency(net)}</span></div></div>`;
-                    }
-                });
-                if (!hasData) {
-                    breakdownList.innerHTML = `<div class="text-center py-8 text-gray-500">No data for ${summaryYear}</div>`
-                } else {
-                     breakdownList.insertAdjacentHTML('afterbegin', `<div class="p-3 rounded-lg grid grid-cols-3 items-center gap-4 text-xs font-bold text-gray-400"><span class="col-span-1">Month</span><div class="col-span-2 grid grid-cols-3 gap-2 text-right"><span>Income</span><span>Expenses</span><span>Net</span></div></div>`);
-                }
-            };
-
-            // --- MODAL & FORM LOGIC ---
-            const openTransactionModal = (type = 'bill', transactionId = null) => {
-                const form = document.getElementById('transaction-form'); form.reset();
-                const modalTitle = document.getElementById('modal-title'); const saveBtn = document.getElementById('save-btn'); const deleteBtn = document.getElementById('delete-btn'); const idField = document.getElementById('transaction-id'); const typeSelect = document.getElementById('transaction-type'); const descInput = document.getElementById('transaction-description'); const amountInput = document.getElementById('transaction-amount'); const dateInput = document.getElementById('transaction-date'); const catContainer = document.getElementById('category-container'); const catSelect = document.getElementById('transaction-category');
-                if (transactionId) {
-                    const t = transactions.find(t => t.id == transactionId); if (!t) return;
-                    modalTitle.textContent = 'Edit Transaction'; saveBtn.textContent = 'Update'; deleteBtn.classList.remove('hidden'); idField.value = t.id; typeSelect.value = t.type; descInput.value = t.description; amountInput.value = t.amount; dateInput.value = t.date; catContainer.classList.toggle('hidden', t.type === 'income'); if (t.type !== 'income') catSelect.value = t.category || 'other';
-                } else {
-                    modalTitle.textContent = `Add ${type.charAt(0).toUpperCase() + type.slice(1)}`; saveBtn.textContent = 'Save'; deleteBtn.classList.add('hidden'); idField.value = ''; typeSelect.value = type; catContainer.classList.toggle('hidden', type === 'income'); const today = new Date(); today.setFullYear(currentDate.getFullYear()); today.setMonth(currentDate.getMonth()); dateInput.value = today.toISOString().split('T')[0];
-                }
-                toggleModal(document.getElementById('add-transaction-modal'), true);
-            };
-            const handleFormSubmit = (e) => {
-                e.preventDefault(); const formData = new FormData(e.target); const id = formData.get('id'); const type = formData.get('type');
-                const transactionData = { type: type, description: formData.get('description'), amount: parseFloat(formData.get('amount')), date: formData.get('date'), category: type === 'income' ? null : formData.get('category') };
-                if (id) {
-                    const index = transactions.findIndex(t => t.id == id); if (index !== -1) transactions[index] = { ...transactions[index], ...transactionData };
-                    showToast('Transaction updated!');
-                } else {
-                    transactions.push({ ...transactionData, id: Date.now(), status: type === 'income' ? 'paid' : 'unpaid' });
-                    showToast('Transaction added!');
-                }
-                saveData(); renderMonthlyTransactions(); toggleModal(document.getElementById('add-transaction-modal'), false);
-            };
-            const handleDelete = () => {
-                const id = document.getElementById('transaction-id').value; if (!id) return;
-                transactions = transactions.filter(t => t.id != id);
-                saveData(); renderMonthlyTransactions(); toggleModal(document.getElementById('add-transaction-modal'), false); showToast('Transaction deleted!', 'error');
-            };
-            const handleListClick = (e) => {
-                const header = e.target.closest('.category-header'); const editBtn = e.target.closest('.edit-btn'); const paidBtn = e.target.closest('.toggle-paid-btn');
-                if (header) {
-                    const categoryKey = header.dataset.categoryKey; collapsedCategories[categoryKey] = !collapsedCategories[categoryKey]; saveData(); renderMonthlyTransactions();
-                } else if (editBtn) {
-                    openTransactionModal(null, editBtn.dataset.id);
-                } else if (paidBtn) {
-                    const transaction = transactions.find(t => t.id == paidBtn.dataset.id); if (transaction) { transaction.status = transaction.status === 'paid' ? 'unpaid' : 'paid'; saveData(); renderMonthlyTransactions(); }
-                }
-            };
-            const populateMonthsCheckboxes = () => {
-                const monthsCheckboxList = document.getElementById('months-checkbox-list');
-                document.getElementById('copy-source-month').textContent = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(currentDate);
-                monthsCheckboxList.innerHTML = '';
-                const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-                monthNames.forEach((month, index) => {
-                    monthsCheckboxList.innerHTML += `<label class="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-700 cursor-pointer text-gray-300"><input type="checkbox" value="${index}" class="month-checkbox rounded bg-gray-600 border-gray-500 text-blue-500 focus:ring-blue-600"><span>${month}</span></label>`;
-                });
-            };
-            const handleCopyMonthSubmit = (e) => {
-                e.preventDefault();
-                const yearsToCopy = parseInt(document.getElementById('years-to-copy-input').value, 10) || 1;
-                const sourceMonth = currentDate.getMonth();
-                const sourceYear = currentDate.getFullYear();
-                const sourceTransactions = transactions.filter(t => new Date(t.date + 'T00:00:00').getMonth() === sourceMonth && new Date(t.date + 'T00:00:00').getFullYear() === sourceYear);
-                
-                if (sourceTransactions.length === 0) { showToast("No transactions in the current month to copy.", 'error'); return; }
-
-                const targetMonths = Array.from(document.querySelectorAll('.month-checkbox:checked')).map(cb => parseInt(cb.value));
-                if (targetMonths.length === 0) { showToast("Please select at least one month to copy to.", 'error'); return; }
-
-                let newTransactions = [];
-                for (let i = 0; i < yearsToCopy; i++) {
-                    const currentTargetYear = sourceYear + i;
-                    targetMonths.forEach(monthIndex => {
-                        if (currentTargetYear === sourceYear && monthIndex <= sourceMonth) { return; }
-                        sourceTransactions.forEach(t => {
-                            const sourceDate = new Date(t.date + 'T00:00:00');
-                            let targetDate = new Date(currentTargetYear, monthIndex, sourceDate.getDate());
-                            if (targetDate.getMonth() !== monthIndex) { targetDate.setDate(0); }
-                            const alreadyExists = transactions.some(et => new Date(et.date + 'T00:00:00').getTime() === targetDate.getTime() && et.description === t.description && et.amount === t.amount);
-                            if (!alreadyExists) {
-                                newTransactions.push({ ...t, id: Date.now() + Math.random(), date: targetDate.toISOString().split('T')[0], status: t.type === 'income' ? 'paid' : 'unpaid' });
-                            }
-                        });
-                    });
-                }
-
-                if (newTransactions.length > 0) {
-                    transactions.push(...newTransactions);
-                    saveData();
-                    showToast(`${newTransactions.length} transaction(s) copied!`);
-                } else {
-                    showToast("No new transactions were copied (they may already exist).", 'error');
-                }
-                toggleModal(document.getElementById('copy-month-modal'), false);
-            };
-            
-            // --- EVENT LISTENERS ---
             transactionsList.addEventListener('click', handleListClick);
             openMenuBtns.forEach(btn => btn.addEventListener('click', () => toggleMenu(true)));
             closeMenuBtn.addEventListener('click', () => toggleMenu(false));
@@ -440,16 +347,11 @@
             document.getElementById('close-copy-modal-btn').addEventListener('click', () => toggleModal(document.getElementById('copy-month-modal'), false));
             document.getElementById('cancel-copy-modal-btn').addEventListener('click', () => toggleModal(document.getElementById('copy-month-modal'), false));
             document.getElementById('copy-month-form').addEventListener('submit', handleCopyMonthSubmit);
-            document.getElementById('select-all-months').addEventListener('change', (e) => {
-                document.querySelectorAll('.month-checkbox:not(:disabled)').forEach(cb => { cb.checked = e.target.checked; });
-            });
+            document.getElementById('select-all-months').addEventListener('change', (e) => { document.querySelectorAll('.month-checkbox:not(:disabled)').forEach(cb => { cb.checked = e.target.checked; }); });
 
-
-            // --- INITIALIZATION ---
             setActiveView('monthly');
         });
     </script>
 </body>
 </html>
-
 
