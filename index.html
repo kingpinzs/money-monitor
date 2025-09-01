@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Money Monitor</title>
+    
+    <!-- PWA Manifest and Theme -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#111827">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.jpg">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -121,10 +127,48 @@
 
     <!-- Modals -->
     <div id="add-transaction-modal" class="modal fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50 hidden opacity-0"><div class="bg-gray-800 w-full max-w-md rounded-2xl shadow-xl p-6 border border-gray-700"><div class="flex justify-between items-center mb-4"><h2 class="text-xl font-bold text-white" id="modal-title">Add Transaction</h2><button id="close-modal-btn"><i data-lucide="x" class="w-6 h-6 text-gray-400 hover:text-white"></i></button></div><form id="transaction-form" class="space-y-4"><input type="hidden" id="transaction-id" name="id"><div><label for="transaction-type" class="block text-sm font-medium text-gray-300 mb-1">Type</label><select id="transaction-type" name="type" class="w-full bg-gray-700 border-gray-600 text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500"><option value="bill">Bill</option><option value="income">Income</option><option value="debt">Debt</option></select></div><div><label for="transaction-description" class="block text-sm font-medium text-gray-300 mb-1">Description</label><input type="text" id="transaction-description" name="description" required class="w-full bg-gray-700 border-gray-600 text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500" placeholder="e.g., Rent, Paycheck"></div><div><label for="transaction-amount" class="block text-sm font-medium text-gray-300 mb-1">Amount</label><input type="number" id="transaction-amount" name="amount" required class="w-full bg-gray-700 border-gray-600 text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500" placeholder="0.00" step="0.01"></div><div id="category-container"><label for="transaction-category" class="block text-sm font-medium text-gray-300 mb-1">Category</label><select id="transaction-category" name="category" class="w-full bg-gray-700 border-gray-600 text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500"><option value="essential">Essential Living Expense</option><option value="subscription">Subscriptions & Memberships</option><option value="discretionary">Discretionary Spending</option><option value="other">Other</option></select></div><div><label for="transaction-date" class="block text-sm font-medium text-gray-300 mb-1">Date</label><input type="date" id="transaction-date" name="date" required class="w-full bg-gray-700 border-gray-600 text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500"></div><div class="flex justify-between items-center w-full pt-4"><button type="button" id="delete-btn" class="px-6 py-2 rounded-lg bg-red-800 hover:bg-red-700 text-red-200 font-semibold hidden">Delete</button><div class="flex gap-3 ml-auto"><button type="button" id="cancel-modal-btn" class="px-6 py-2 rounded-lg bg-gray-600 hover:bg-gray-500">Cancel</button><button type="submit" id="save-btn" class="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700">Save</button></div></div></form></div></div>
-    <div id="copy-month-modal" class="modal fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50 hidden opacity-0"><div class="bg-gray-800 w-full max-w-md rounded-2xl shadow-xl p-6 border border-gray-700"><div class="flex justify-between items-center mb-4"><h2 class="text-xl font-bold text-white">Copy Bills To...</h2><button id="close-copy-modal-btn"><i data-lucide="x" class="w-6 h-6 text-gray-400 hover:text-white"></i></button></div><form id="copy-month-form"><p class="text-gray-400 text-sm mb-4">Select months to copy transactions from <span id="copy-source-month" class="font-semibold text-white"></span>.</p><div id="months-checkbox-list" class="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-60 overflow-y-auto custom-scrollbar pr-2"></div><div class="mt-4"><label class="flex items-center space-x-2 text-sm text-gray-300 cursor-pointer"><input type="checkbox" id="select-all-months" class="rounded bg-gray-700 border-gray-600 text-blue-500 focus:ring-blue-600"><span>Select All</span></label></div><div class="flex justify-end gap-3 pt-6"><button type="button" id="cancel-copy-modal-btn" class="px-6 py-2 rounded-lg bg-gray-600 hover:bg-gray-500">Cancel</button><button type="submit" class="px-6 py-2 rounded-lg bg-green-600 hover:bg-green-700">Copy</button></div></form></div></div>
+    <div id="copy-month-modal" class="modal fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50 hidden opacity-0">
+        <div class="bg-gray-800 w-full max-w-md rounded-2xl shadow-xl p-6 border border-gray-700">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-white">Copy Bills To...</h2>
+                <button id="close-copy-modal-btn"><i data-lucide="x" class="w-6 h-6 text-gray-400 hover:text-white"></i></button>
+            </div>
+            <form id="copy-month-form">
+                <p class="text-gray-400 text-sm mb-4">Select months to copy transactions from <span id="copy-source-month" class="font-semibold text-white"></span>.</p>
+                
+                <div class="mb-4">
+                    <label for="years-to-copy-input" class="block text-sm font-medium text-gray-300 mb-1">Number of years to copy forward</label>
+                    <input type="number" id="years-to-copy-input" name="years" value="1" min="1" max="10" class="w-full bg-gray-700 border-gray-600 text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <div id="months-checkbox-list" class="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-48 overflow-y-auto custom-scrollbar pr-2"></div>
+                <div class="mt-4">
+                    <label class="flex items-center space-x-2 text-sm text-gray-300 cursor-pointer">
+                        <input type="checkbox" id="select-all-months" class="rounded bg-gray-700 border-gray-600 text-blue-500 focus:ring-blue-600">
+                        <span>Select All Months</span>
+                    </label>
+                </div>
+                <div class="flex justify-end gap-3 pt-6">
+                    <button type="button" id="cancel-copy-modal-btn" class="px-6 py-2 rounded-lg bg-gray-600 hover:bg-gray-500">Cancel</button>
+                    <button type="submit" class="px-6 py-2 rounded-lg bg-green-600 hover:bg-green-700">Copy</button>
+                </div>
+            </form>
+        </div>
+    </div>
     <div id="toast" class="fixed bottom-24 sm:bottom-10 right-10 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-20 opacity-0"></div>
 
     <script>
+        // PWA Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js').then(registration => {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                }, err => {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             // --- STATE MANAGEMENT ---
             let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
@@ -314,7 +358,7 @@
                 transactions = transactions.filter(t => t.id != id);
                 saveData(); renderMonthlyTransactions(); toggleModal(document.getElementById('add-transaction-modal'), false); showToast('Transaction deleted!', 'error');
             };
-             const handleListClick = (e) => {
+            const handleListClick = (e) => {
                 const header = e.target.closest('.category-header'); const editBtn = e.target.closest('.edit-btn'); const paidBtn = e.target.closest('.toggle-paid-btn');
                 if (header) {
                     const categoryKey = header.dataset.categoryKey; collapsedCategories[categoryKey] = !collapsedCategories[categoryKey]; saveData(); renderMonthlyTransactions();
@@ -323,6 +367,53 @@
                 } else if (paidBtn) {
                     const transaction = transactions.find(t => t.id == paidBtn.dataset.id); if (transaction) { transaction.status = transaction.status === 'paid' ? 'unpaid' : 'paid'; saveData(); renderMonthlyTransactions(); }
                 }
+            };
+            const populateMonthsCheckboxes = () => {
+                const monthsCheckboxList = document.getElementById('months-checkbox-list');
+                document.getElementById('copy-source-month').textContent = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(currentDate);
+                monthsCheckboxList.innerHTML = '';
+                const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                monthNames.forEach((month, index) => {
+                    monthsCheckboxList.innerHTML += `<label class="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-700 cursor-pointer text-gray-300"><input type="checkbox" value="${index}" class="month-checkbox rounded bg-gray-600 border-gray-500 text-blue-500 focus:ring-blue-600"><span>${month}</span></label>`;
+                });
+            };
+            const handleCopyMonthSubmit = (e) => {
+                e.preventDefault();
+                const yearsToCopy = parseInt(document.getElementById('years-to-copy-input').value, 10) || 1;
+                const sourceMonth = currentDate.getMonth();
+                const sourceYear = currentDate.getFullYear();
+                const sourceTransactions = transactions.filter(t => new Date(t.date + 'T00:00:00').getMonth() === sourceMonth && new Date(t.date + 'T00:00:00').getFullYear() === sourceYear);
+                
+                if (sourceTransactions.length === 0) { showToast("No transactions in the current month to copy.", 'error'); return; }
+
+                const targetMonths = Array.from(document.querySelectorAll('.month-checkbox:checked')).map(cb => parseInt(cb.value));
+                if (targetMonths.length === 0) { showToast("Please select at least one month to copy to.", 'error'); return; }
+
+                let newTransactions = [];
+                for (let i = 0; i < yearsToCopy; i++) {
+                    const currentTargetYear = sourceYear + i;
+                    targetMonths.forEach(monthIndex => {
+                        if (currentTargetYear === sourceYear && monthIndex <= sourceMonth) { return; }
+                        sourceTransactions.forEach(t => {
+                            const sourceDate = new Date(t.date + 'T00:00:00');
+                            let targetDate = new Date(currentTargetYear, monthIndex, sourceDate.getDate());
+                            if (targetDate.getMonth() !== monthIndex) { targetDate.setDate(0); }
+                            const alreadyExists = transactions.some(et => new Date(et.date + 'T00:00:00').getTime() === targetDate.getTime() && et.description === t.description && et.amount === t.amount);
+                            if (!alreadyExists) {
+                                newTransactions.push({ ...t, id: Date.now() + Math.random(), date: targetDate.toISOString().split('T')[0], status: t.type === 'income' ? 'paid' : 'unpaid' });
+                            }
+                        });
+                    });
+                }
+
+                if (newTransactions.length > 0) {
+                    transactions.push(...newTransactions);
+                    saveData();
+                    showToast(`${newTransactions.length} transaction(s) copied!`);
+                } else {
+                    showToast("No new transactions were copied (they may already exist).", 'error');
+                }
+                toggleModal(document.getElementById('copy-month-modal'), false);
             };
             
             // --- EVENT LISTENERS ---
@@ -333,7 +424,7 @@
             document.getElementById('add-income-menu-btn').addEventListener('click', () => { toggleMenu(false); openTransactionModal('income'); });
             document.getElementById('add-bill-menu-btn').addEventListener('click', () => { toggleMenu(false); openTransactionModal('bill'); });
             document.getElementById('add-debt-menu-btn').addEventListener('click', () => { toggleMenu(false); openTransactionModal('debt'); });
-            document.getElementById('copy-month-btn').addEventListener('click', () => { toggleMenu(false); toggleModal(document.getElementById('copy-month-modal'), true); });
+            document.getElementById('copy-month-btn').addEventListener('click', () => { populateMonthsCheckboxes(); toggleMenu(false); toggleModal(document.getElementById('copy-month-modal'), true); });
             overviewViewBtn.addEventListener('click', () => setActiveView('overview'));
             monthlyViewBtn.addEventListener('click', () => setActiveView('monthly'));
             yearlyViewBtn.addEventListener('click', () => setActiveView('yearly'));
@@ -347,6 +438,11 @@
             document.getElementById('cancel-modal-btn').addEventListener('click', () => toggleModal(document.getElementById('add-transaction-modal'), false));
             document.getElementById('close-copy-modal-btn').addEventListener('click', () => toggleModal(document.getElementById('copy-month-modal'), false));
             document.getElementById('cancel-copy-modal-btn').addEventListener('click', () => toggleModal(document.getElementById('copy-month-modal'), false));
+            document.getElementById('copy-month-form').addEventListener('submit', handleCopyMonthSubmit);
+            document.getElementById('select-all-months').addEventListener('change', (e) => {
+                document.querySelectorAll('.month-checkbox:not(:disabled)').forEach(cb => { cb.checked = e.target.checked; });
+            });
+
 
             // --- INITIALIZATION ---
             setActiveView('monthly');
@@ -354,3 +450,4 @@
     </script>
 </body>
 </html>
+
