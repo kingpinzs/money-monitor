@@ -654,13 +654,8 @@
             document.getElementById('delete-btn').addEventListener('click', handleDelete);
             document.getElementById('close-modal-btn').addEventListener('click', () => toggleModal(document.getElementById('add-transaction-modal'), false));
             document.getElementById('cancel-modal-btn').addEventListener('click', () => toggleModal(document.getElementById('add-transaction-modal'), false));
-            document.getElementById('transaction-type').addEventListener('change', (e) => {
-                const categoryContainer = document.getElementById('category-container');
-                if (e.target.value === 'income') {
-                    categoryContainer.style.display = 'none';
-                } else {
-                    categoryContainer.style.display = 'block';
-                }
+            function toggleCategoryVisibility(transactionType) {
+                toggleCategoryVisibility(e.target.value);
             });
             document.getElementById('close-copy-modal-btn').addEventListener('click', () => toggleModal(document.getElementById('copy-month-modal'), false));
             document.getElementById('cancel-copy-modal-btn').addEventListener('click', () => toggleModal(document.getElementById('copy-month-modal'), false));
