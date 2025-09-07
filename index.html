@@ -689,7 +689,7 @@
             document.getElementById('cancel-modal-btn').addEventListener('click', () => toggleModal(document.getElementById('add-transaction-modal'), false));
             function toggleCategoryVisibility(transactionType) {
                 toggleCategoryVisibility(e.target.value);
-            });
+            };
             document.getElementById('close-copy-modal-btn').addEventListener('click', () => toggleModal(document.getElementById('copy-month-modal'), false));
             document.getElementById('cancel-copy-modal-btn').addEventListener('click', () => toggleModal(document.getElementById('copy-month-modal'), false));
             document.getElementById('copy-month-form').addEventListener('submit', handleCopyMonthSubmit);
