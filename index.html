@@ -581,6 +581,47 @@
             const handleGoalFormSubmit = (e) => { e.preventDefault(); const formData = new FormData(e.target); const id = formData.get('id'); const goalData = { name: formData.get('name'), amount: parseFloat(formData.get('amount')), saved: parseFloat(formData.get('saved')), date: formData.get('date'), type: formData.get('type'), icon: formData.get('icon') }; if (id) { const index = goals.findIndex(g => g.id == id); if (index > -1) goals[index] = {...goals[index], ...goalData}; showToast('Goal updated!'); } else { goals.push({ ...goalData, id: Date.now() }); showToast('Goal added!'); } if (goalData.type === 'debt' && goalData.saved >= goalData.amount) { showVictory(goalData.name); } saveData(); renderGoalsPage(); toggleModal(goalModal, false); };
             const handleDeleteGoal = () => { const id = document.getElementById('goal-id').value; goals = goals.filter(g => g.id != id); saveData(); renderGoalsPage(); toggleModal(goalModal, false); showToast('Goal deleted', 'error'); };
             const showVictory = (debtName) => { const modal = document.getElementById('victory-modal'); document.getElementById('victory-debt-name').textContent = debtName; toggleModal(modal, true); setTimeout(() => toggleModal(modal, false), 4000); };
+            const openTransactionModal = (type = 'bill', transactionId = null) => {
+                const modal = document.getElementById('add-transaction-modal');
+                const form = document.getElementById('transaction-form');
+                const modalTitle = document.getElementById('modal-title');
+                const deleteBtn = document.getElementById('delete-btn');
+                const categoryContainer = document.getElementById('category-container');
+                
+                form.reset();
+                
+                if (transactionId) {
+                    const transaction = transactions.find(t => t.id == transactionId);
+                    if (!transaction) return;
+                    
+                    modalTitle.textContent = 'Edit Transaction';
+                    deleteBtn.classList.remove('hidden');
+                    document.getElementById('transaction-id').value = transaction.id;
+                    document.getElementById('transaction-type').value = transaction.type;
+                    document.getElementById('transaction-description').value = transaction.description;
+                    document.getElementById('transaction-amount').value = transaction.amount;
+                    document.getElementById('transaction-date').value = transaction.date;
+                    if (transaction.category) {
+                        document.getElementById('transaction-category').value = transaction.category;
+                    }
+                } else {
+                    modalTitle.textContent = 'Add Transaction';
+                    deleteBtn.classList.add('hidden');
+                    document.getElementById('transaction-id').value = '';
+                    document.getElementById('transaction-type').value = type;
+                    const today = new Date().toISOString().split('T')[0];
+                    document.getElementById('transaction-date').value = today;
+                }
+                
+                // Show/hide category field based on transaction type
+                if (document.getElementById('transaction-type').value === 'income') {
+                    categoryContainer.style.display = 'none';
+                } else {
+                    categoryContainer.style.display = 'block';
+                }
+                
+                toggleModal(modal, true);
+            };
             const handleFormSubmit = (e) => { e.preventDefault(); const formData = new FormData(e.target); const id = formData.get('id'); const type = formData.get('type'); const transactionData = { type: type, description: formData.get('description'), amount: parseFloat(formData.get('amount')), date: formData.get('date'), category: type === 'income' ? null : formData.get('category') }; if (id) { const index = transactions.findIndex(t => t.id == id); if (index !== -1) transactions[index] = { ...transactions[index], ...transactionData }; showToast('Transaction updated!'); } else { transactions.push({ ...transactionData, id: Date.now(), status: type === 'income' ? 'paid' : 'unpaid' }); showToast('Transaction added!'); addXp(XP_VALUES.ADD_TRANSACTION); } saveData(); setActiveView('monthly'); toggleModal(document.getElementById('add-transaction-modal'), false); };
             const handleDelete = () => { const id = document.getElementById('transaction-id').value; if (!id) return; transactions = transactions.filter(t => t.id != id); saveData(); setActiveView('monthly'); toggleModal(document.getElementById('add-transaction-modal'), false); showToast('Transaction deleted!', 'error'); };
             const handleListClick = (e) => { const header = e.target.closest('.category-header'); const editBtn = e.target.closest('.edit-btn'); const paidBtn = e.target.closest('.toggle-paid-btn'); if (header) { const categoryKey = header.dataset.categoryKey; collapsedCategories[categoryKey] = !collapsedCategories[categoryKey]; saveData(); renderMonthlyTransactions(); } else if (editBtn) { openTransactionModal(null, editBtn.dataset.id); } else if (paidBtn) { const transaction = transactions.find(t => t.id == paidBtn.dataset.id); if (transaction) { if (transaction.status !== 'paid') addXp(XP_VALUES.PAY_BILL); transaction.status = transaction.status === 'paid' ? 'unpaid' : 'paid'; saveData(); renderMonthlyTransactions(); } } };
@@ -613,6 +654,9 @@
             document.getElementById('delete-btn').addEventListener('click', handleDelete);
             document.getElementById('close-modal-btn').addEventListener('click', () => toggleModal(document.getElementById('add-transaction-modal'), false));
             document.getElementById('cancel-modal-btn').addEventListener('click', () => toggleModal(document.getElementById('add-transaction-modal'), false));
+            function toggleCategoryVisibility(transactionType) {
+                toggleCategoryVisibility(e.target.value);
+            });
             document.getElementById('close-copy-modal-btn').addEventListener('click', () => toggleModal(document.getElementById('copy-month-modal'), false));
             document.getElementById('cancel-copy-modal-btn').addEventListener('click', () => toggleModal(document.getElementById('copy-month-modal'), false));
             document.getElementById('copy-month-form').addEventListener('submit', handleCopyMonthSubmit);
