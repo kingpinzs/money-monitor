@@ -82,6 +82,27 @@
             }
 
         }
+        /* Mobile navigation optimizations for 375px and smaller screens */
+        @media (max-width: 375px) {
+            /* Bottom navigation mobile optimization */
+            footer nav {
+                padding-left: 0.25rem;
+                padding-right: 0.25rem;
+            }
+            footer nav button {
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
+                min-width: 0;
+            }
+            footer nav button i {
+                width: 1.25rem;
+                height: 1.25rem;
+            }
+            footer nav button span {
+                font-size: 0.6rem;
+                line-height: 0.75rem;
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-800 overflow-x-hidden">
@@ -101,8 +122,9 @@
                 
                 <div class="pt-6 border-t border-gray-700">
                      <button id="copy-month-btn" class="w-full flex items-center gap-3 p-3 rounded-lg bg-green-600 hover:bg-green-700 font-semibold mb-4"><i data-lucide="copy-plus" class="w-5 h-5"></i><span>Copy Month's Bills</span></button>
-                     <label for="csv-importer" class="w-full flex items-center gap-3 p-3 rounded-lg bg-indigo-600 hover:bg-indigo-700 font-semibold cursor-pointer"><i data-lucide="upload" class="w-5 h-5"></i><span>Import CSV</span></label>
+                     <label for="csv-importer" class="w-full flex items-center gap-3 p-3 rounded-lg bg-indigo-600 hover:bg-indigo-700 font-semibold cursor-pointer mb-4"><i data-lucide="upload" class="w-5 h-5"></i><span>Import CSV</span></label>
                      <input type="file" id="csv-importer" class="hidden" accept=".csv">
+                     <button id="learning-menu-btn" class="w-full flex items-center gap-3 p-3 rounded-lg bg-purple-600 hover:bg-purple-700 font-semibold"><i data-lucide="book-open" class="w-5 h-5"></i><span>Learning Hub</span></button>
                 </div>
             </nav>
             <div class="mt-auto">
@@ -287,7 +309,6 @@
                 <button id="monthly-view-btn" class="flex flex-col items-center text-gray-400 hover:text-white transition-colors px-4 py-2"><i data-lucide="wallet" class="w-6 h-6 mb-1"></i><span class="text-xs" style="font-size: 0.75rem;">Monthly</span></button>
                 <button id="goals-view-btn" class="flex flex-col items-center text-gray-400 hover:text-white transition-colors px-4 py-2"><i data-lucide="target" class="w-6 h-6 mb-1"></i><span class="text-xs" style="font-size: 0.75rem;">Goals</span></button>
                 <button id="planning-view-btn" class="flex flex-col items-center text-gray-400 hover:text-white transition-colors px-4 py-2"><i data-lucide="sliders-horizontal" class="w-6 h-6 mb-1"></i><span class="text-xs" style="font-size: 0.75rem;">Planner</span></button>
-                <button id="learning-view-btn" class="flex flex-col items-center text-gray-400 hover:text-white transition-colors px-4 py-2"><i data-lucide="book-open" class="w-6 h-6 mb-1"></i><span class="text-xs" style="font-size: 0.75rem;">Learn</span></button>
                 <button id="yearly-view-btn" class="flex flex-col items-center text-gray-400 hover:text-white transition-colors px-4 py-2"><i data-lucide="calendar-days" class="w-6 h-6 mb-1"></i><span class="text-xs" style="font-size: 0.75rem;">Yearly</span></button>
             </nav>
         </footer>
@@ -396,7 +417,6 @@
             const yearlyViewBtn = document.getElementById('yearly-view-btn');
             const goalsViewBtn = document.getElementById('goals-view-btn');
             const planningViewBtn = document.getElementById('planning-view-btn');
-            const learningViewBtn = document.getElementById('learning-view-btn');
             const transactionsList = document.getElementById('transactions-list');
             const addGoalBtn = document.getElementById('add-goal-btn');
             const goalModal = document.getElementById('goal-modal');
@@ -486,7 +506,7 @@
             // --- VIEW MANAGEMENT ---
             const setActiveView = (viewName) => {
                 const views = { overview: overviewView, monthly: monthlyView, yearly: yearlyView, goals: goalsView, planning: planningView, learning: learningView };
-                const buttons = { overview: overviewViewBtn, monthly: monthlyViewBtn, yearly: yearlyViewBtn, goals: goalsViewBtn, planning: planningViewBtn, learning: learningViewBtn };
+                const buttons = { overview: overviewViewBtn, monthly: monthlyViewBtn, yearly: yearlyViewBtn, goals: goalsViewBtn, planning: planningViewBtn };
                 for (const key in views) {
                     views[key].classList.toggle('hidden', key !== viewName);
                     if (buttons[key]) {
@@ -680,13 +700,13 @@
             document.getElementById('add-income-menu-btn').addEventListener('click', () => { toggleMenu(false); openTransactionModal('income'); });
             document.getElementById('add-bill-menu-btn').addEventListener('click', () => { toggleMenu(false); openTransactionModal('bill'); });
             document.getElementById('add-debt-menu-btn').addEventListener('click', () => { toggleMenu(false); openTransactionModal('debt'); });
+            document.getElementById('learning-menu-btn').addEventListener('click', () => { toggleMenu(false); setActiveView('learning'); });
             document.getElementById('copy-month-btn').addEventListener('click', () => { populateMonthsCheckboxes(); toggleMenu(false); toggleModal(document.getElementById('copy-month-modal'), true); });
             overviewViewBtn.addEventListener('click', () => setActiveView('overview'));
             monthlyViewBtn.addEventListener('click', () => setActiveView('monthly'));
             yearlyViewBtn.addEventListener('click', () => setActiveView('yearly'));
             goalsViewBtn.addEventListener('click', () => setActiveView('goals'));
             planningViewBtn.addEventListener('click', () => setActiveView('planning'));
-            learningViewBtn.addEventListener('click', () => setActiveView('learning'));
             document.getElementById('prev-month-btn').addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() - 1); renderMonthlyTransactions(); });
             document.getElementById('next-month-btn').addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() + 1); renderMonthlyTransactions(); });
             document.getElementById('prev-year-btn').addEventListener('click', () => { summaryYear--; renderYearlySummary(); });
