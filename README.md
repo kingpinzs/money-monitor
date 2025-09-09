@@ -61,7 +61,7 @@ A modern, mobile-first Progressive Web App (PWA) for personal budget and expense
 #### Option 2: Run Locally
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_USERNAME/money-monitor.git
+git clone https://github.com/<owner>/money-monitor.git  # Replace <owner> with the GitHub username or organization
 
 # Navigate to project directory
 cd money-monitor
