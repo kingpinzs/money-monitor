@@ -152,8 +152,8 @@ money-monitor/
 ├── manifest.json       # PWA manifest configuration
 ├── service-worker.js   # Service worker for offline support
 ├── icons/             # App icons for installation
-│   ├── icon-192x192.jpg
-│   └── icon-512x512.jpg
+│   ├── icon-192x192.png
+│   └── icon-512x512.png
 └── README.md          # This file
 ```
 
