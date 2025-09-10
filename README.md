@@ -2,7 +2,6 @@
 
 A modern, mobile-first Progressive Web App (PWA) for personal budget and expense tracking. Take control of your finances with an intuitive interface designed for on-the-go money management.
 
-![Money Monitor Overview](https://github.com/user-attachments/assets/bda4a0f1-5dfa-409d-afbf-55f539228ee3)
 
 ## ✨ Features
 
@@ -220,7 +219,26 @@ We welcome contributions! Here's how to get started:
 
 ## 📄 License
 
-This project is open source and available under the [MIT License](LICENSE).
+This project is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License.
+
+You are free to:
+- **Share** — copy and redistribute the material in any medium or format
+- **Adapt** — remix, transform, and build upon the material
+
+Under the following terms:
+- **Attribution** — You must give appropriate credit, provide a link to the license, and indicate if changes were made
+- **NonCommercial** — You may not use the material for commercial purposes
+- **ShareAlike** — If you remix, transform, or build upon the material, you must distribute your contributions under the same license as the original
+
+For more details, see the [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](https://creativecommons.org/licenses/by-nc-sa/4.0/).
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## Support
+
+If you encounter any issues or have questions, please open an issue in the repository.
 
 ## 🙏 Acknowledgments
 
