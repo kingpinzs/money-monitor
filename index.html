@@ -49,6 +49,17 @@
             border-color: #3b82f6;
             background-color: rgba(59, 130, 246, 0.2);
         }
+        /* Wizard styles */
+        .wizard-radio:checked + .wizard-option {
+            border-color: #3b82f6;
+            background-color: rgba(59, 130, 246, 0.2);
+        }
+        .wizard-option {
+            transition: all 0.2s ease-in-out;
+        }
+        .wizard-step {
+            min-height: 300px;
+        }
         /* Fixed header styles for mobile navigation fix */
         .sticky-header {
             position: sticky;
@@ -148,6 +159,7 @@
                 <button id="add-debt-menu-btn" class="w-full flex items-center gap-3 p-3 rounded-lg bg-red-600 hover:bg-red-700 font-semibold"><i data-lucide="credit-card" class="w-5 h-5"></i><span>Add Debt</span></button>
                 
                 <div class="pt-6 border-t border-gray-700">
+                     <button id="planning-wizard-menu-btn" class="w-full flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 font-semibold mb-4"><i data-lucide="wand-2" class="w-5 h-5"></i><span>Planning Wizard</span></button>
                      <button id="copy-month-btn" class="w-full flex items-center gap-3 p-3 rounded-lg bg-green-600 hover:bg-green-700 font-semibold mb-4"><i data-lucide="copy-plus" class="w-5 h-5"></i><span>Copy Month's Bills</span></button>
                      <label for="csv-importer" class="w-full flex items-center gap-3 p-3 rounded-lg bg-indigo-600 hover:bg-indigo-700 font-semibold cursor-pointer mb-4"><i data-lucide="upload" class="w-5 h-5"></i><span>Import CSV</span></label>
                      <input type="file" id="csv-importer" class="hidden" accept=".csv">
@@ -440,6 +452,315 @@
             </div>
         </div>
     </div>
+
+    <!-- Planning Wizard Modal -->
+    <div id="planning-wizard-modal" class="modal fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50 hidden opacity-0">
+        <div class="bg-gray-800 w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-xl border border-gray-700">
+            <!-- Wizard Header -->
+            <div class="sticky top-0 bg-gray-800 border-b border-gray-700 p-6 rounded-t-2xl">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">Welcome to Money Monitor! 🎯</h2>
+                        <p class="text-gray-400 mt-1">Let's set up your financial profile in just a few steps</p>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-sm text-gray-400">Step <span id="wizard-current-step">1</span> of <span id="wizard-total-steps">6</span></div>
+                        <div class="w-32 bg-gray-700 rounded-full h-2 mt-2">
+                            <div id="wizard-progress-bar" class="bg-blue-500 h-2 rounded-full transition-all duration-300" style="width: 16.67%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Wizard Content -->
+            <div class="p-6">
+                <!-- Step 1: Personal Info -->
+                <div id="wizard-step-1" class="wizard-step">
+                    <h3 class="text-xl font-semibold text-white mb-4">Tell us about yourself</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">What's your relationship status?</label>
+                            <div class="grid grid-cols-2 gap-3">
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="relationship" value="single" class="hidden wizard-radio">
+                                    <div class="wizard-option p-4 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-colors">
+                                        <i data-lucide="user" class="w-6 h-6 mb-2 mx-auto text-blue-400"></i>
+                                        <div class="text-center text-white font-medium">Single</div>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="relationship" value="married" class="hidden wizard-radio">
+                                    <div class="wizard-option p-4 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-colors">
+                                        <i data-lucide="users" class="w-6 h-6 mb-2 mx-auto text-blue-400"></i>
+                                        <div class="text-center text-white font-medium">Married/Partnered</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Do you have children?</label>
+                            <div class="grid grid-cols-3 gap-3">
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="children" value="none" class="hidden wizard-radio">
+                                    <div class="wizard-option p-3 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-colors text-center">
+                                        <div class="text-white font-medium">No children</div>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="children" value="1-2" class="hidden wizard-radio">
+                                    <div class="wizard-option p-3 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-colors text-center">
+                                        <div class="text-white font-medium">1-2 children</div>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="children" value="3+" class="hidden wizard-radio">
+                                    <div class="wizard-option p-3 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-colors text-center">
+                                        <div class="text-white font-medium">3+ children</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Income -->
+                <div id="wizard-step-2" class="wizard-step hidden">
+                    <h3 class="text-xl font-semibold text-white mb-4">Let's talk about income</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">What's your approximate monthly income? (after taxes)</label>
+                            <div class="grid grid-cols-2 gap-3">
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="income-range" value="under-3000" class="hidden wizard-radio">
+                                    <div class="wizard-option p-4 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-colors text-center">
+                                        <div class="text-white font-medium">Under $3,000</div>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="income-range" value="3000-5000" class="hidden wizard-radio">
+                                    <div class="wizard-option p-4 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-colors text-center">
+                                        <div class="text-white font-medium">$3,000 - $5,000</div>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="income-range" value="5000-7500" class="hidden wizard-radio">
+                                    <div class="wizard-option p-4 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-colors text-center">
+                                        <div class="text-white font-medium">$5,000 - $7,500</div>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="income-range" value="over-7500" class="hidden wizard-radio">
+                                    <div class="wizard-option p-4 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-colors text-center">
+                                        <div class="text-white font-medium">Over $7,500</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Work arrangement?</label>
+                            <div class="grid grid-cols-2 gap-3">
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="work-arrangement" value="single-income" class="hidden wizard-radio">
+                                    <div class="wizard-option p-4 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-colors">
+                                        <i data-lucide="briefcase" class="w-6 h-6 mb-2 mx-auto text-blue-400"></i>
+                                        <div class="text-center text-white font-medium">Single Income</div>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="work-arrangement" value="dual-income" class="hidden wizard-radio">
+                                    <div class="wizard-option p-4 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-colors">
+                                        <i data-lucide="users" class="w-6 h-6 mb-2 mx-auto text-blue-400"></i>
+                                        <div class="text-center text-white font-medium">Dual Income</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Housing -->
+                <div id="wizard-step-3" class="wizard-step hidden">
+                    <h3 class="text-xl font-semibold text-white mb-4">Housing situation</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Are you renting or buying?</label>
+                            <div class="grid grid-cols-2 gap-3">
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="housing" value="renting" class="hidden wizard-radio">
+                                    <div class="wizard-option p-4 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-colors">
+                                        <i data-lucide="key" class="w-6 h-6 mb-2 mx-auto text-blue-400"></i>
+                                        <div class="text-center text-white font-medium">Renting</div>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="housing" value="buying" class="hidden wizard-radio">
+                                    <div class="wizard-option p-4 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-colors">
+                                        <i data-lucide="home" class="w-6 h-6 mb-2 mx-auto text-blue-400"></i>
+                                        <div class="text-center text-white font-medium">Buying/Own</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Where do you live?</label>
+                            <div class="grid grid-cols-2 gap-3">
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="location" value="urban" class="hidden wizard-radio">
+                                    <div class="wizard-option p-4 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-colors">
+                                        <i data-lucide="building" class="w-6 h-6 mb-2 mx-auto text-blue-400"></i>
+                                        <div class="text-center text-white font-medium">Urban/City</div>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="location" value="suburban" class="hidden wizard-radio">
+                                    <div class="wizard-option p-4 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-colors">
+                                        <i data-lucide="trees" class="w-6 h-6 mb-2 mx-auto text-blue-400"></i>
+                                        <div class="text-center text-white font-medium">Suburban/Rural</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 4: Lifestyle -->
+                <div id="wizard-step-4" class="wizard-step hidden">
+                    <h3 class="text-xl font-semibold text-white mb-4">Lifestyle preferences</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Do you have pets?</label>
+                            <div class="grid grid-cols-2 gap-3">
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="pets" value="none" class="hidden wizard-radio">
+                                    <div class="wizard-option p-4 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-colors text-center">
+                                        <div class="text-white font-medium">No pets</div>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="pets" value="yes" class="hidden wizard-radio">
+                                    <div class="wizard-option p-4 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-colors">
+                                        <i data-lucide="heart" class="w-6 h-6 mb-2 mx-auto text-blue-400"></i>
+                                        <div class="text-center text-white font-medium">Yes, I have pets</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Work from home?</label>
+                            <div class="grid grid-cols-3 gap-3">
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="work-from-home" value="never" class="hidden wizard-radio">
+                                    <div class="wizard-option p-3 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-colors text-center">
+                                        <div class="text-white font-medium">Never</div>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="work-from-home" value="sometimes" class="hidden wizard-radio">
+                                    <div class="wizard-option p-3 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-colors text-center">
+                                        <div class="text-white font-medium">Sometimes</div>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="work-from-home" value="always" class="hidden wizard-radio">
+                                    <div class="wizard-option p-3 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-colors text-center">
+                                        <div class="text-white font-medium">Always</div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 5: Goals -->
+                <div id="wizard-step-5" class="wizard-step hidden">
+                    <h3 class="text-xl font-semibold text-white mb-4">Financial goals</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">What's your main financial priority?</label>
+                            <div class="space-y-3">
+                                <label class="cursor-pointer block">
+                                    <input type="radio" name="priority" value="emergency-fund" class="hidden wizard-radio">
+                                    <div class="wizard-option p-4 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-colors">
+                                        <div class="flex items-center">
+                                            <i data-lucide="shield" class="w-6 h-6 mr-3 text-blue-400"></i>
+                                            <div>
+                                                <div class="text-white font-medium">Emergency Fund</div>
+                                                <div class="text-gray-400 text-sm">Build a safety net for unexpected expenses</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer block">
+                                    <input type="radio" name="priority" value="debt-payoff" class="hidden wizard-radio">
+                                    <div class="wizard-option p-4 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-colors">
+                                        <div class="flex items-center">
+                                            <i data-lucide="credit-card" class="w-6 h-6 mr-3 text-blue-400"></i>
+                                            <div>
+                                                <div class="text-white font-medium">Pay Off Debt</div>
+                                                <div class="text-gray-400 text-sm">Focus on eliminating credit card or loan debt</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer block">
+                                    <input type="radio" name="priority" value="savings" class="hidden wizard-radio">
+                                    <div class="wizard-option p-4 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-colors">
+                                        <div class="flex items-center">
+                                            <i data-lucide="piggy-bank" class="w-6 h-6 mr-3 text-blue-400"></i>
+                                            <div>
+                                                <div class="text-white font-medium">Long-term Savings</div>
+                                                <div class="text-gray-400 text-sm">Save for a big purchase or investment</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 6: Review -->
+                <div id="wizard-step-6" class="wizard-step hidden">
+                    <h3 class="text-xl font-semibold text-white mb-4">Your personalized setup</h3>
+                    <div class="space-y-4">
+                        <div class="bg-gray-900 p-4 rounded-lg">
+                            <h4 class="font-semibold text-white mb-3">Based on your answers, we'll set up:</h4>
+                            <div id="wizard-recommendations" class="space-y-2 text-gray-300">
+                                <!-- Recommendations will be inserted here -->
+                            </div>
+                        </div>
+                        <div class="bg-blue-900/20 border border-blue-500/30 p-4 rounded-lg">
+                            <div class="flex items-start">
+                                <i data-lucide="info" class="w-5 h-5 text-blue-400 mr-3 mt-0.5"></i>
+                                <div class="text-sm text-blue-200">
+                                    <p class="font-medium mb-1">Don't worry!</p>
+                                    <p>You can adjust any of these recommendations later in the app. This is just a starting point based on your preferences.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Wizard Navigation -->
+            <div class="sticky bottom-0 bg-gray-800 border-t border-gray-700 p-6 rounded-b-2xl">
+                <div class="flex justify-between">
+                    <button id="wizard-prev-btn" class="px-6 py-2 rounded-lg bg-gray-600 hover:bg-gray-700 text-white font-medium disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        Previous
+                    </button>
+                    <div class="flex gap-3">
+                        <button id="wizard-skip-btn" class="px-6 py-2 rounded-lg border border-gray-600 hover:bg-gray-700 text-gray-300 font-medium">
+                            Skip Setup
+                        </button>
+                        <button id="wizard-next-btn" class="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium">
+                            Next
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="level-up-toast" class="fixed top-10 left-1/2 -translate-x-1/2 bg-yellow-500 text-black px-6 py-3 rounded-lg shadow-lg transform -translate-y-20 opacity-0 flex items-center gap-3">
         <i data-lucide="star"></i>
         <span class="font-bold"></span>
@@ -462,7 +783,7 @@
             // --- STATE MANAGEMENT ---
             let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
             let goals = JSON.parse(localStorage.getItem('goals')) || [];
-            let userProfile = JSON.parse(localStorage.getItem('userProfile')) || { level: 1, xp: 0, savingsStreak: 0, lastContributionDate: null, lastSubscriptionReview: null };
+            let userProfile = JSON.parse(localStorage.getItem('userProfile')) || { level: 1, xp: 0, savingsStreak: 0, lastContributionDate: null, lastSubscriptionReview: null, wizardCompleted: false };
             let collapsedCategories = JSON.parse(localStorage.getItem('collapsedCategories')) || {};
             let currentDate = new Date(); currentDate.setDate(1);
             let summaryYear = new Date().getFullYear();
@@ -502,6 +823,17 @@
             const goalForm = document.getElementById('goal-form');
             const csvImporter = document.getElementById('csv-importer');
             const csvConfirmationModal = document.getElementById('csv-confirmation-modal');
+
+            // --- WIZARD ELEMENTS ---
+            const wizardModal = document.getElementById('planning-wizard-modal');
+            const wizardSteps = document.querySelectorAll('.wizard-step');
+            const wizardPrevBtn = document.getElementById('wizard-prev-btn');
+            const wizardNextBtn = document.getElementById('wizard-next-btn');
+            const wizardSkipBtn = document.getElementById('wizard-skip-btn');
+            const wizardCurrentStepEl = document.getElementById('wizard-current-step');
+            const wizardProgressBar = document.getElementById('wizard-progress-bar');
+            let currentWizardStep = 1;
+            let wizardData = {};
 
             // --- HELPER FUNCTIONS ---
             const formatCurrency = (amount) => `$${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -580,6 +912,401 @@
                 showToast(`Savings streak: ${userProfile.savingsStreak} weeks! +${XP_VALUES.WEEKLY_STREAK} XP`);
                 addXp(XP_VALUES.WEEKLY_STREAK);
                 updateProfileUI();
+            };
+            
+            // --- WIZARD FUNCTIONS ---
+            const showWizard = () => {
+                toggleModal(wizardModal, true);
+                currentWizardStep = 1;
+                updateWizardStep();
+            };
+
+            const updateWizardStep = () => {
+                // Hide all steps
+                wizardSteps.forEach(step => step.classList.add('hidden'));
+                
+                // Show current step
+                document.getElementById(`wizard-step-${currentWizardStep}`).classList.remove('hidden');
+                
+                // Update progress bar
+                const totalSteps = 6;
+                const progress = (currentWizardStep / totalSteps) * 100;
+                wizardProgressBar.style.width = `${progress}%`;
+                wizardCurrentStepEl.textContent = currentWizardStep;
+                
+                // Update navigation buttons
+                wizardPrevBtn.disabled = currentWizardStep === 1;
+                wizardNextBtn.textContent = currentWizardStep === totalSteps ? 'Complete Setup' : 'Next';
+                
+                // Update step data if moving forward
+                if (currentWizardStep > 1) {
+                    collectCurrentStepData();
+                }
+                
+                // Update recommendations on final step
+                if (currentWizardStep === 6) {
+                    updateWizardRecommendations();
+                }
+            };
+
+            const collectCurrentStepData = () => {
+                const currentStep = currentWizardStep - 1; // Previous step since we moved forward
+                
+                if (currentStep === 1) {
+                    wizardData.relationship = document.querySelector('input[name="relationship"]:checked')?.value;
+                    wizardData.children = document.querySelector('input[name="children"]:checked')?.value;
+                } else if (currentStep === 2) {
+                    wizardData.incomeRange = document.querySelector('input[name="income-range"]:checked')?.value;
+                    wizardData.workArrangement = document.querySelector('input[name="work-arrangement"]:checked')?.value;
+                } else if (currentStep === 3) {
+                    wizardData.housing = document.querySelector('input[name="housing"]:checked')?.value;
+                    wizardData.location = document.querySelector('input[name="location"]:checked')?.value;
+                } else if (currentStep === 4) {
+                    wizardData.pets = document.querySelector('input[name="pets"]:checked')?.value;
+                    wizardData.workFromHome = document.querySelector('input[name="work-from-home"]:checked')?.value;
+                } else if (currentStep === 5) {
+                    wizardData.priority = document.querySelector('input[name="priority"]:checked')?.value;
+                }
+            };
+
+            const updateWizardRecommendations = () => {
+                const recommendations = generateRecommendations(wizardData);
+                const container = document.getElementById('wizard-recommendations');
+                container.innerHTML = recommendations.map(rec => 
+                    `<div class="flex items-center"><i data-lucide="${rec.icon}" class="w-4 h-4 mr-2 text-blue-400"></i>${rec.text}</div>`
+                ).join('');
+                lucide.createIcons();
+            };
+
+            const generateRecommendations = (data) => {
+                const recommendations = [];
+                
+                // Income recommendations
+                const incomeAmounts = {
+                    'under-3000': 2500,
+                    '3000-5000': 4000,
+                    '5000-7500': 6000,
+                    'over-7500': 8000
+                };
+                const estimatedIncome = incomeAmounts[data.incomeRange] || 4000;
+                
+                if (data.workArrangement === 'dual-income') {
+                    recommendations.push({
+                        icon: 'dollar-sign',
+                        text: `Primary income (~$${estimatedIncome}) and secondary income (~$${Math.round(estimatedIncome * 0.7)})`
+                    });
+                } else {
+                    recommendations.push({
+                        icon: 'dollar-sign',
+                        text: `Monthly income of ~$${estimatedIncome}`
+                    });
+                }
+                
+                // Housing recommendations
+                const housingCost = Math.round(estimatedIncome * (data.housing === 'renting' ? 0.3 : 0.25));
+                recommendations.push({
+                    icon: 'home',
+                    text: `${data.housing === 'renting' ? 'Rent' : 'Mortgage'} of ~$${housingCost}`
+                });
+                
+                // Utility costs based on location and housing
+                const utilityMultiplier = data.location === 'urban' ? 1.2 : 1.0;
+                const utilities = Math.round(150 * utilityMultiplier);
+                recommendations.push({
+                    icon: 'zap',
+                    text: `Utilities (electricity, gas, water) ~$${utilities}`
+                });
+                
+                // Internet (higher for work from home)
+                const internetCost = data.workFromHome === 'always' ? 80 : 50;
+                recommendations.push({
+                    icon: 'wifi',
+                    text: `Internet ${data.workFromHome === 'always' ? '(high-speed for WFH)' : ''} ~$${internetCost}`
+                });
+                
+                // Transportation (lower for work from home)
+                if (data.workFromHome !== 'always') {
+                    const transportCost = data.location === 'urban' ? 200 : 300;
+                    recommendations.push({
+                        icon: 'car',
+                        text: `Transportation/gas ~$${transportCost}`
+                    });
+                }
+                
+                // Phone bill
+                const phoneCost = data.relationship === 'married' ? 120 : 60;
+                recommendations.push({
+                    icon: 'smartphone',
+                    text: `Phone bill ${data.relationship === 'married' ? '(family plan)' : ''} ~$${phoneCost}`
+                });
+                
+                // Groceries based on family size
+                let groceryMultiplier = 1;
+                if (data.relationship === 'married') groceryMultiplier += 0.7;
+                if (data.children === '1-2') groceryMultiplier += 0.8;
+                if (data.children === '3+') groceryMultiplier += 1.5;
+                const groceries = Math.round(300 * groceryMultiplier);
+                recommendations.push({
+                    icon: 'shopping-cart',
+                    text: `Groceries ~$${groceries}`
+                });
+                
+                // Pet expenses
+                if (data.pets === 'yes') {
+                    recommendations.push({
+                        icon: 'heart',
+                        text: `Pet expenses (food, vet, etc.) ~$100`
+                    });
+                }
+                
+                // Goal based on priority
+                const goalAmount = Math.round(estimatedIncome * 3); // 3 months emergency fund
+                if (data.priority === 'emergency-fund') {
+                    recommendations.push({
+                        icon: 'shield',
+                        text: `Emergency fund goal of $${goalAmount} (3 months expenses)`
+                    });
+                } else if (data.priority === 'debt-payoff') {
+                    recommendations.push({
+                        icon: 'credit-card',
+                        text: `Debt payoff goal (you can set the amount based on your debts)`
+                    });
+                } else {
+                    recommendations.push({
+                        icon: 'piggy-bank',
+                        text: `Savings goal of $${Math.round(goalAmount / 2)} (customize based on your target)`
+                    });
+                }
+                
+                return recommendations;
+            };
+
+            const completeWizard = () => {
+                collectCurrentStepData(); // Collect final step data
+                
+                // Generate and add transactions
+                const recommendedTransactions = generateTransactions(wizardData);
+                transactions.push(...recommendedTransactions);
+                
+                // Generate and add goals
+                const recommendedGoals = generateGoals(wizardData);
+                goals.push(...recommendedGoals);
+                
+                // Mark wizard as completed
+                userProfile.wizardCompleted = true;
+                
+                // Save all data
+                saveData();
+                
+                // Close modal and show success
+                toggleModal(wizardModal, false);
+                showToast('Welcome setup complete! You can adjust everything in the app.', 'success');
+                
+                // Refresh the current view
+                setActiveView('overview');
+            };
+
+            const generateTransactions = (data) => {
+                const currentMonth = new Date().toISOString().slice(0, 7);
+                const transactions = [];
+                
+                // Income recommendations
+                const incomeAmounts = {
+                    'under-3000': 2500,
+                    '3000-5000': 4000,
+                    '5000-7500': 6000,
+                    'over-7500': 8000
+                };
+                const estimatedIncome = incomeAmounts[data.incomeRange] || 4000;
+                
+                transactions.push({
+                    id: Date.now(),
+                    type: 'income',
+                    description: 'Primary Income',
+                    amount: estimatedIncome,
+                    date: currentMonth,
+                    paid: false,
+                    category: 'salary'
+                });
+                
+                if (data.workArrangement === 'dual-income') {
+                    transactions.push({
+                        id: Date.now() + 1,
+                        type: 'income',
+                        description: 'Secondary Income',
+                        amount: Math.round(estimatedIncome * 0.7),
+                        date: currentMonth,
+                        paid: false,
+                        category: 'salary'
+                    });
+                }
+                
+                // Housing
+                const housingCost = Math.round(estimatedIncome * (data.housing === 'renting' ? 0.3 : 0.25));
+                transactions.push({
+                    id: Date.now() + 2,
+                    type: 'bill',
+                    description: data.housing === 'renting' ? 'Rent' : 'Mortgage',
+                    amount: housingCost,
+                    date: currentMonth,
+                    paid: false,
+                    category: 'housing'
+                });
+                
+                // Utilities
+                const utilityMultiplier = data.location === 'urban' ? 1.2 : 1.0;
+                transactions.push({
+                    id: Date.now() + 3,
+                    type: 'bill',
+                    description: 'Electricity',
+                    amount: Math.round(80 * utilityMultiplier),
+                    date: currentMonth,
+                    paid: false,
+                    category: 'utilities'
+                });
+                
+                transactions.push({
+                    id: Date.now() + 4,
+                    type: 'bill',
+                    description: 'Gas',
+                    amount: Math.round(50 * utilityMultiplier),
+                    date: currentMonth,
+                    paid: false,
+                    category: 'utilities'
+                });
+                
+                transactions.push({
+                    id: Date.now() + 5,
+                    type: 'bill',
+                    description: 'Water/Sewer',
+                    amount: Math.round(40 * utilityMultiplier),
+                    date: currentMonth,
+                    paid: false,
+                    category: 'utilities'
+                });
+                
+                // Internet
+                const internetCost = data.workFromHome === 'always' ? 80 : 50;
+                transactions.push({
+                    id: Date.now() + 6,
+                    type: 'bill',
+                    description: 'Internet',
+                    amount: internetCost,
+                    date: currentMonth,
+                    paid: false,
+                    category: 'utilities'
+                });
+                
+                // Phone
+                const phoneCost = data.relationship === 'married' ? 120 : 60;
+                transactions.push({
+                    id: Date.now() + 7,
+                    type: 'bill',
+                    description: 'Phone',
+                    amount: phoneCost,
+                    date: currentMonth,
+                    paid: false,
+                    category: 'utilities'
+                });
+                
+                // Transportation
+                if (data.workFromHome !== 'always') {
+                    const transportCost = data.location === 'urban' ? 200 : 300;
+                    transactions.push({
+                        id: Date.now() + 8,
+                        type: 'bill',
+                        description: 'Transportation/Gas',
+                        amount: transportCost,
+                        date: currentMonth,
+                        paid: false,
+                        category: 'transportation'
+                    });
+                }
+                
+                // Groceries
+                let groceryMultiplier = 1;
+                if (data.relationship === 'married') groceryMultiplier += 0.7;
+                if (data.children === '1-2') groceryMultiplier += 0.8;
+                if (data.children === '3+') groceryMultiplier += 1.5;
+                const groceries = Math.round(300 * groceryMultiplier);
+                transactions.push({
+                    id: Date.now() + 9,
+                    type: 'bill',
+                    description: 'Groceries',
+                    amount: groceries,
+                    date: currentMonth,
+                    paid: false,
+                    category: 'food'
+                });
+                
+                // Pet expenses
+                if (data.pets === 'yes') {
+                    transactions.push({
+                        id: Date.now() + 10,
+                        type: 'bill',
+                        description: 'Pet Expenses',
+                        amount: 100,
+                        date: currentMonth,
+                        paid: false,
+                        category: 'pets'
+                    });
+                }
+                
+                return transactions;
+            };
+
+            const generateGoals = (data) => {
+                const goals = [];
+                const incomeAmounts = {
+                    'under-3000': 2500,
+                    '3000-5000': 4000,
+                    '5000-7500': 6000,
+                    'over-7500': 8000
+                };
+                const estimatedIncome = incomeAmounts[data.incomeRange] || 4000;
+                
+                if (data.priority === 'emergency-fund') {
+                    const goalAmount = Math.round(estimatedIncome * 3);
+                    goals.push({
+                        id: Date.now(),
+                        type: 'savings',
+                        name: 'Emergency Fund',
+                        amount: goalAmount,
+                        saved: 0,
+                        targetDate: new Date(Date.now() + (365 * 24 * 60 * 60 * 1000)).toISOString().slice(0, 10), // 1 year from now
+                        icon: 'shield'
+                    });
+                } else if (data.priority === 'debt-payoff') {
+                    goals.push({
+                        id: Date.now(),
+                        type: 'debt',
+                        name: 'Pay Off Credit Card',
+                        amount: 5000, // Default amount, user can adjust
+                        saved: 0,
+                        targetDate: new Date(Date.now() + (365 * 24 * 60 * 60 * 1000)).toISOString().slice(0, 10),
+                        icon: 'credit-card'
+                    });
+                } else {
+                    const goalAmount = Math.round(estimatedIncome * 1.5);
+                    goals.push({
+                        id: Date.now(),
+                        type: 'savings',
+                        name: 'Savings Goal',
+                        amount: goalAmount,
+                        saved: 0,
+                        targetDate: new Date(Date.now() + (365 * 24 * 60 * 60 * 1000)).toISOString().slice(0, 10),
+                        icon: 'piggy-bank'
+                    });
+                }
+                
+                return goals;
+            };
+
+            const skipWizard = () => {
+                userProfile.wizardCompleted = true;
+                saveData();
+                toggleModal(wizardModal, false);
+                showToast('Setup skipped. You can run the wizard anytime from the menu.', 'success');
             };
             
             // --- VIEW MANAGEMENT ---
@@ -965,10 +1692,63 @@
                 toggleModal(document.getElementById('subscription-review-modal'), false);
             });
 
+            // --- WIZARD EVENT LISTENERS ---
+            wizardPrevBtn.addEventListener('click', () => {
+                if (currentWizardStep > 1) {
+                    currentWizardStep--;
+                    updateWizardStep();
+                }
+            });
+
+            wizardNextBtn.addEventListener('click', () => {
+                if (currentWizardStep < 6) {
+                    // Check if current step has required selections
+                    const currentStepEl = document.getElementById(`wizard-step-${currentWizardStep}`);
+                    const radios = currentStepEl.querySelectorAll('input[type="radio"]');
+                    const radioGroups = {};
+                    radios.forEach(radio => {
+                        if (!radioGroups[radio.name]) radioGroups[radio.name] = [];
+                        radioGroups[radio.name].push(radio);
+                    });
+                    
+                    let allRequiredSelected = true;
+                    for (const groupName in radioGroups) {
+                        const hasSelection = radioGroups[groupName].some(radio => radio.checked);
+                        if (!hasSelection) {
+                            allRequiredSelected = false;
+                            break;
+                        }
+                    }
+                    
+                    if (!allRequiredSelected) {
+                        showToast('Please select an option for each question', 'error');
+                        return;
+                    }
+                    
+                    currentWizardStep++;
+                    updateWizardStep();
+                } else {
+                    // Complete wizard
+                    completeWizard();
+                }
+            });
+
+            wizardSkipBtn.addEventListener('click', skipWizard);
+            
+            document.getElementById('planning-wizard-menu-btn').addEventListener('click', () => {
+                toggleMenu(false);
+                showWizard();
+            });
+
             // --- INITIALIZATION ---
             updateProfileUI();
             setActiveView('overview');
             checkForSubscriptionReview();
+            
+            // Show wizard for first-time users
+            if (!userProfile.wizardCompleted && transactions.length === 0 && goals.length === 0) {
+                setTimeout(() => showWizard(), 1000); // Small delay for better UX
+            }
         });
     </script>
 </body>
