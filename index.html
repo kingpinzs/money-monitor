@@ -342,7 +342,59 @@
     </div>
 
     <!-- Modals -->
-    <div id="add-transaction-modal" class="modal fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50 hidden opacity-0"><div class="bg-gray-800 w-full max-w-md rounded-2xl shadow-xl p-6 border border-gray-700"><div class="flex justify-between items-center mb-4"><h2 class="text-xl font-bold text-white" id="modal-title">Add Transaction</h2><button id="close-modal-btn"><i data-lucide="x" class="w-6 h-6 text-gray-400 hover:text-white"></i></button></div><form id="transaction-form" class="space-y-4"><input type="hidden" id="transaction-id" name="id"><div><label for="transaction-type" class="block text-sm font-medium text-gray-300 mb-1">Type</label><select id="transaction-type" name="type" class="w-full bg-gray-700 border-gray-600 text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500"><option value="bill">Bill</option><option value="income">Income</option><option value="debt">Debt</option></select></div><div><label for="transaction-description" class="block text-sm font-medium text-gray-300 mb-1">Description</label><input type="text" id="transaction-description" name="description" required class="w-full bg-gray-700 border-gray-600 text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500" placeholder="e.g., Rent, Paycheck"></div><div><label for="transaction-amount" class="block text-sm font-medium text-gray-300 mb-1">Amount</label><input type="number" id="transaction-amount" name="amount" required class="w-full bg-gray-700 border-gray-600 text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500" placeholder="0.00" step="0.01"></div><div id="category-container"><label for="transaction-category" class="block text-sm font-medium text-gray-300 mb-1">Category</label><select id="transaction-category" name="category" class="w-full bg-gray-700 border-gray-600 text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500"><option value="essential">Essential Living Expense</option><option value="subscription">Subscriptions & Memberships</option><option value="discretionary">Discretionary Spending</option><option value="unexpected">Unexpected Spending</option><option value="other">Other</option></select></div><div><label for="transaction-date" class="block text-sm font-medium text-gray-300 mb-1">Date</label><input type="date" id="transaction-date" name="date" required class="w-full bg-gray-700 border-gray-600 text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500"></div><div class="flex justify-between items-center w-full pt-4"><button type="button" id="delete-btn" class="px-6 py-2 rounded-lg bg-red-800 hover:bg-red-700 text-red-200 font-semibold hidden">Delete</button><div class="flex gap-3 ml-auto"><button type="button" id="cancel-modal-btn" class="px-6 py-2 rounded-lg bg-gray-600 hover:bg-gray-500">Cancel</button><button type="submit" id="save-btn" class="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700">Save</button></div></div></form></div></div>
+    <div id="add-transaction-modal" class="modal fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50 hidden opacity-0">
+        <div class="bg-gray-800 w-full max-w-md rounded-2xl shadow-xl p-6 border border-gray-700">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-white" id="modal-title">Add Transaction</h2>
+                <button id="close-modal-btn"><i data-lucide="x" class="w-6 h-6 text-gray-400 hover:text-white"></i></button>
+            </div>
+            <form id="transaction-form" class="space-y-4">
+                <input type="hidden" id="transaction-id" name="id">
+                <div>
+                    <label for="transaction-type" class="block text-sm font-medium text-gray-300 mb-1">Type</label>
+                    <select id="transaction-type" name="type" class="w-full bg-gray-700 border-gray-600 text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500">
+                        <option value="bill">Bill</option>
+                        <option value="income">Income</option>
+                        <option value="debt">Debt</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="transaction-description" class="block text-sm font-medium text-gray-300 mb-1">Description</label>
+                    <input type="text" id="transaction-description" name="description" required class="w-full bg-gray-700 border-gray-600 text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500" placeholder="e.g., Rent, Paycheck">
+                </div>
+                <div>
+                    <label for="transaction-amount" class="block text-sm font-medium text-gray-300 mb-1">Amount</label>
+                    <input type="number" id="transaction-amount" name="amount" required class="w-full bg-gray-700 border-gray-600 text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500" placeholder="0.00" step="0.01">
+                </div>
+                <div id="total-debt-container" style="display: none;">
+                    <label for="transaction-total-debt" class="block text-sm font-medium text-gray-300 mb-1">Total Debt Amount (Optional)</label>
+                    <input type="number" id="transaction-total-debt" name="totalDebtAmount" class="w-full bg-gray-700 border-gray-600 text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500" placeholder="e.g., 5000.00" step="0.01">
+                    <p class="text-xs text-gray-400 mt-1">Enter the total amount of debt you're tracking to monitor progress</p>
+                </div>
+                <div id="category-container">
+                    <label for="transaction-category" class="block text-sm font-medium text-gray-300 mb-1">Category</label>
+                    <select id="transaction-category" name="category" class="w-full bg-gray-700 border-gray-600 text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500">
+                        <option value="essential">Essential Living Expense</option>
+                        <option value="subscription">Subscriptions & Memberships</option>
+                        <option value="discretionary">Discretionary Spending</option>
+                        <option value="unexpected">Unexpected Spending</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="transaction-date" class="block text-sm font-medium text-gray-300 mb-1">Date</label>
+                    <input type="date" id="transaction-date" name="date" required class="w-full bg-gray-700 border-gray-600 text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="flex justify-between items-center w-full pt-4">
+                    <button type="button" id="delete-btn" class="px-6 py-2 rounded-lg bg-red-800 hover:bg-red-700 text-red-200 font-semibold hidden">Delete</button>
+                    <div class="flex gap-3 ml-auto">
+                        <button type="button" id="cancel-modal-btn" class="px-6 py-2 rounded-lg bg-gray-600 hover:bg-gray-500">Cancel</button>
+                        <button type="submit" id="save-btn" class="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700">Save</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
     <div id="copy-month-modal" class="modal fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50 hidden opacity-0"> <div class="bg-gray-800 w-full max-w-md rounded-2xl shadow-xl p-6 border border-gray-700"> <div class="flex justify-between items-center mb-4"> <h2 class="text-xl font-bold text-white">Copy Bills To...</h2> <button id="close-copy-modal-btn"><i data-lucide="x" class="w-6 h-6 text-gray-400 hover:text-white"></i></button> </div> <form id="copy-month-form"> <p class="text-gray-400 text-sm mb-4">Select months to copy transactions from <span id="copy-source-month" class="font-semibold text-white"></span>.</p> <div class="mb-4"> <label for="years-to-copy-input" class="block text-sm font-medium text-gray-300 mb-1">Number of years to copy forward</label> <input type="number" id="years-to-copy-input" name="years" value="1" min="1" max="10" class="w-full bg-gray-700 border-gray-600 text-white rounded-lg p-3 focus:ring-2 focus:ring-blue-500"> </div> <div id="months-checkbox-list" class="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-48 overflow-y-auto custom-scrollbar pr-2"></div> <div class="mt-4"> <label class="flex items-center space-x-2 text-sm text-gray-300 cursor-pointer"> <input type="checkbox" id="select-all-months" class="rounded bg-gray-700 border-gray-600 text-blue-500 focus:ring-blue-600"> <span>Select All Months</span> </label> </div> <div class="flex justify-end gap-3 pt-6"> <button type="button" id="cancel-copy-modal-btn" class="px-6 py-2 rounded-lg bg-gray-600 hover:bg-gray-500">Cancel</button> <button type="submit" class="px-6 py-2 rounded-lg bg-green-600 hover:bg-green-700">Copy</button> </div> </form> </div> </div>
     <div id="csv-confirmation-modal" class="modal fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50 hidden opacity-0"> <div class="bg-gray-800 w-full max-w-lg rounded-2xl shadow-xl p-6 border border-gray-700"> <h2 class="text-xl font-bold text-white mb-4">Confirm Import</h2> <p class="text-gray-400 mb-4">Found <strong id="csv-record-count" class="text-white">0</strong> transactions. Do you want to import them?</p> <div class="max-h-60 overflow-y-auto custom-scrollbar p-2 bg-gray-900 rounded-lg mb-4" id="csv-preview-list"></div> <div class="flex justify-end gap-3 pt-4"> <button type="button" id="cancel-csv-import-btn" class="px-6 py-2 rounded-lg bg-gray-600 hover:bg-gray-500">Cancel</button> <button type="button" id="confirm-csv-import-btn" class="px-6 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700">Import</button> </div> </div> </div>
     <div id="goal-modal" class="modal fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50 hidden opacity-0">
@@ -666,7 +718,7 @@
                 const status = statusStyles[t.status] || statusStyles['unpaid']; 
                 const formatDate = (ds) => new Date(ds + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); 
                 
-                // Check if this debt transaction has a corresponding debt goal
+                // Check if this debt transaction has a corresponding debt goal or totalDebtAmount
                 let debtProgressBar = '';
                 if (t.type === 'debt') {
                     const matchingGoal = goals.find(g => g.type === 'debt' && 
@@ -684,6 +736,23 @@
                             <div class="mt-2 pt-2 border-t border-gray-600">
                                 <div class="flex justify-between text-xs text-gray-400 mb-1">
                                     <span>Total Debt: ${formatCurrency(matchingGoal.amount)}</span>
+                                    <span>Remaining: ${formatCurrency(remaining)}</span>
+                                </div>
+                                <div class="w-full bg-gray-700 rounded-full h-2">
+                                    <div class="bg-red-500 h-2 rounded-full transition-all duration-300" style="width: ${progressPercent}%"></div>
+                                </div>
+                                <div class="text-xs text-center mt-1 text-gray-400">
+                                    ${progressPercent.toFixed(1)}% paid off
+                                </div>
+                            </div>`;
+                    } else if (t.totalDebtAmount) {
+                        // Show progress based on transaction's totalDebtAmount field
+                        const progressPercent = Math.min(100, (t.amount / t.totalDebtAmount) * 100);
+                        const remaining = Math.max(0, t.totalDebtAmount - t.amount);
+                        debtProgressBar = `
+                            <div class="mt-2 pt-2 border-t border-gray-600">
+                                <div class="flex justify-between text-xs text-gray-400 mb-1">
+                                    <span>Total Debt: ${formatCurrency(t.totalDebtAmount)}</span>
                                     <span>Remaining: ${formatCurrency(remaining)}</span>
                                 </div>
                                 <div class="w-full bg-gray-700 rounded-full h-2">
@@ -748,6 +817,7 @@
                 const modalTitle = document.getElementById('modal-title');
                 const deleteBtn = document.getElementById('delete-btn');
                 const categoryContainer = document.getElementById('category-container');
+                const totalDebtContainer = document.getElementById('total-debt-container');
                 
                 form.reset();
                 
@@ -765,6 +835,9 @@
                     if (transaction.category) {
                         document.getElementById('transaction-category').value = transaction.category;
                     }
+                    if (transaction.totalDebtAmount) {
+                        document.getElementById('transaction-total-debt').value = transaction.totalDebtAmount;
+                    }
                 } else {
                     modalTitle.textContent = 'Add Transaction';
                     deleteBtn.classList.add('hidden');
@@ -774,16 +847,52 @@
                     document.getElementById('transaction-date').value = today;
                 }
                 
-                // Show/hide category field based on transaction type
-                if (document.getElementById('transaction-type').value === 'income') {
+                // Show/hide fields based on transaction type
+                const transactionType = document.getElementById('transaction-type').value;
+                if (transactionType === 'income') {
                     categoryContainer.style.display = 'none';
+                    totalDebtContainer.style.display = 'none';
+                } else if (transactionType === 'debt') {
+                    categoryContainer.style.display = 'block';
+                    totalDebtContainer.style.display = 'block';
                 } else {
                     categoryContainer.style.display = 'block';
+                    totalDebtContainer.style.display = 'none';
                 }
                 
                 toggleModal(modal, true);
             };
-            const handleFormSubmit = (e) => { e.preventDefault(); const formData = new FormData(e.target); const id = formData.get('id'); const type = formData.get('type'); const transactionData = { type: type, description: formData.get('description'), amount: parseFloat(formData.get('amount')), date: formData.get('date'), category: type === 'income' ? null : formData.get('category') }; if (id) { const index = transactions.findIndex(t => t.id == id); if (index !== -1) transactions[index] = { ...transactions[index], ...transactionData }; showToast('Transaction updated!'); } else { transactions.push({ ...transactionData, id: Date.now(), status: type === 'income' ? 'paid' : 'unpaid' }); showToast('Transaction added!'); addXp(XP_VALUES.ADD_TRANSACTION); } saveData(); setActiveView('monthly'); toggleModal(document.getElementById('add-transaction-modal'), false); };
+            const handleFormSubmit = (e) => { 
+                e.preventDefault(); 
+                const formData = new FormData(e.target); 
+                const id = formData.get('id'); 
+                const type = formData.get('type'); 
+                const transactionData = { 
+                    type: type, 
+                    description: formData.get('description'), 
+                    amount: parseFloat(formData.get('amount')), 
+                    date: formData.get('date'), 
+                    category: type === 'income' ? null : formData.get('category') 
+                };
+                
+                // Add totalDebtAmount for debt transactions
+                if (type === 'debt' && formData.get('totalDebtAmount')) {
+                    transactionData.totalDebtAmount = parseFloat(formData.get('totalDebtAmount'));
+                }
+                
+                if (id) { 
+                    const index = transactions.findIndex(t => t.id == id); 
+                    if (index !== -1) transactions[index] = { ...transactions[index], ...transactionData }; 
+                    showToast('Transaction updated!'); 
+                } else { 
+                    transactions.push({ ...transactionData, id: Date.now(), status: type === 'income' ? 'paid' : 'unpaid' }); 
+                    showToast('Transaction added!'); 
+                    addXp(XP_VALUES.ADD_TRANSACTION); 
+                } 
+                saveData(); 
+                setActiveView('monthly'); 
+                toggleModal(document.getElementById('add-transaction-modal'), false); 
+            };
             const handleDelete = () => { const id = document.getElementById('transaction-id').value; if (!id) return; transactions = transactions.filter(t => t.id != id); saveData(); setActiveView('monthly'); toggleModal(document.getElementById('add-transaction-modal'), false); showToast('Transaction deleted!', 'error'); };
             const handleListClick = (e) => { const header = e.target.closest('.category-header'); const editBtn = e.target.closest('.edit-btn'); const paidBtn = e.target.closest('.toggle-paid-btn'); if (header) { const categoryKey = header.dataset.categoryKey; collapsedCategories[categoryKey] = !collapsedCategories[categoryKey]; saveData(); renderMonthlyTransactions(); } else if (editBtn) { openTransactionModal(null, editBtn.dataset.id); } else if (paidBtn) { const transaction = transactions.find(t => t.id == paidBtn.dataset.id); if (transaction) { if (transaction.status !== 'paid') addXp(XP_VALUES.PAY_BILL); transaction.status = transaction.status === 'paid' ? 'unpaid' : 'paid'; saveData(); renderMonthlyTransactions(); } } };
             const populateMonthsCheckboxes = () => { const monthsCheckboxList = document.getElementById('months-checkbox-list'); document.getElementById('copy-source-month').textContent = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(currentDate); monthsCheckboxList.innerHTML = ''; const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]; monthNames.forEach((month, index) => { monthsCheckboxList.innerHTML += `<label class="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-700 cursor-pointer text-gray-300"><input type="checkbox" value="${index}" class="month-checkbox rounded bg-gray-600 border-gray-500 text-blue-500 focus:ring-blue-600"><span>${month}</span></label>`; }); };
@@ -815,6 +924,25 @@
             document.getElementById('delete-btn').addEventListener('click', handleDelete);
             document.getElementById('close-modal-btn').addEventListener('click', () => toggleModal(document.getElementById('add-transaction-modal'), false));
             document.getElementById('cancel-modal-btn').addEventListener('click', () => toggleModal(document.getElementById('add-transaction-modal'), false));
+            
+            // Add event listener for transaction type changes
+            document.getElementById('transaction-type').addEventListener('change', (e) => {
+                const categoryContainer = document.getElementById('category-container');
+                const totalDebtContainer = document.getElementById('total-debt-container');
+                const type = e.target.value;
+                
+                if (type === 'income') {
+                    categoryContainer.style.display = 'none';
+                    totalDebtContainer.style.display = 'none';
+                } else if (type === 'debt') {
+                    categoryContainer.style.display = 'block';
+                    totalDebtContainer.style.display = 'block';
+                } else {
+                    categoryContainer.style.display = 'block';
+                    totalDebtContainer.style.display = 'none';
+                }
+            });
+            
             function toggleCategoryVisibility(transactionType) {
                 toggleCategoryVisibility(e.target.value);
             };
