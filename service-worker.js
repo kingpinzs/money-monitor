@@ -1,5 +1,5 @@
 // --- Versioning -------------------------------------------------------------
-const CACHE_VERSION = 5;
+const CACHE_VERSION = 6;
 const CACHE_NAME = `money-monitor-cache-v${CACHE_VERSION}`;
 
 // --- App Shell --------------------------------------------------------------
