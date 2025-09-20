@@ -163,7 +163,11 @@
                      <button id="copy-month-btn" class="w-full flex items-center gap-3 p-3 rounded-lg bg-green-600 hover:bg-green-700 font-semibold mb-4"><i data-lucide="copy-plus" class="w-5 h-5"></i><span>Copy Month's Bills</span></button>
                      <label for="csv-importer" class="w-full flex items-center gap-3 p-3 rounded-lg bg-indigo-600 hover:bg-indigo-700 font-semibold cursor-pointer mb-4"><i data-lucide="upload" class="w-5 h-5"></i><span>Import CSV</span></label>
                      <input type="file" id="csv-importer" class="hidden" accept=".csv">
-                     <button id="learning-menu-btn" class="w-full flex items-center gap-3 p-3 rounded-lg bg-purple-600 hover:bg-purple-700 font-semibold"><i data-lucide="book-open" class="w-5 h-5"></i><span>Learning Hub</span></button>
+                     <button id="learning-menu-btn" class="w-full flex items-center gap-3 p-3 rounded-lg bg-purple-600 hover:bg-purple-700 font-semibold mb-4"><i data-lucide="book-open" class="w-5 h-5"></i><span>Learning Hub</span></button>
+                     
+                     <div class="pt-4 border-t border-gray-700">
+                         <button id="reset-all-menu-btn" class="w-full flex items-center gap-3 p-3 rounded-lg bg-red-600 hover:bg-red-700 font-semibold"><i data-lucide="trash-2" class="w-5 h-5"></i><span>Reset All</span></button>
+                     </div>
                 </div>
             </nav>
             <div class="mt-auto">
@@ -449,6 +453,36 @@
             <div class="max-h-60 overflow-y-auto custom-scrollbar p-2 bg-gray-900 rounded-lg mb-4" id="subscription-list"></div>
             <div class="flex justify-end gap-3 pt-4">
                 <button type="button" id="close-subscription-modal-btn" class="px-6 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700">Got it!</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reset All Confirmation Modal -->
+    <div id="reset-all-modal" class="modal fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50 hidden opacity-0">
+        <div class="bg-gray-800 w-full max-w-md rounded-2xl shadow-xl p-6 border border-gray-700">
+            <div class="text-center mb-6">
+                <i data-lucide="alert-triangle" class="w-16 h-16 mx-auto text-red-400 mb-4"></i>
+                <h2 class="text-xl font-bold text-white mb-2">⚠️ Reset All Data</h2>
+                <p class="text-gray-400 mb-4">This will permanently delete ALL your data including:</p>
+                <ul class="text-left text-gray-300 text-sm space-y-1 mb-4">
+                    <li>• All transactions and bills</li>
+                    <li>• All savings goals</li>
+                    <li>• User profile and progress</li>
+                    <li>• Settings and preferences</li>
+                </ul>
+                <p class="text-red-400 font-semibold text-sm">This action cannot be undone!</p>
+            </div>
+            
+            <div class="mb-6">
+                <label for="reset-confirmation-input" class="block text-sm font-medium text-gray-300 mb-2">
+                    Type "reset" to confirm you want to delete everything:
+                </label>
+                <input type="text" id="reset-confirmation-input" class="w-full bg-gray-700 border-gray-600 text-white rounded-lg p-3 focus:ring-2 focus:ring-red-500" placeholder="Type 'reset' here">
+            </div>
+            
+            <div class="flex justify-end gap-3">
+                <button type="button" id="cancel-reset-btn" class="px-6 py-2 rounded-lg bg-gray-600 hover:bg-gray-500">Cancel</button>
+                <button type="button" id="confirm-reset-btn" class="px-6 py-2 rounded-lg bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed" disabled>Reset Everything</button>
             </div>
         </div>
     </div>
@@ -890,6 +924,10 @@
             const goalForm = document.getElementById('goal-form');
             const csvImporter = document.getElementById('csv-importer');
             const csvConfirmationModal = document.getElementById('csv-confirmation-modal');
+            const resetAllModal = document.getElementById('reset-all-modal');
+            const resetConfirmationInput = document.getElementById('reset-confirmation-input');
+            const confirmResetBtn = document.getElementById('confirm-reset-btn');
+            const cancelResetBtn = document.getElementById('cancel-reset-btn');
 
             // --- WIZARD ELEMENTS ---
             const wizardModal = document.getElementById('planning-wizard-modal');
@@ -942,6 +980,33 @@
                 lastDayOfWeek.setDate(lastDayOfWeek.getDate() + 6);
                 lastDayOfWeek.setHours(23,59,59,999);
                 return d2 >= firstDayOfWeek && d2 <= lastDayOfWeek;
+            };
+
+            // --- RESET FUNCTIONALITY ---
+            const resetAllData = () => {
+                // Clear all localStorage data
+                localStorage.removeItem('transactions');
+                localStorage.removeItem('goals');
+                localStorage.removeItem('userProfile');
+                localStorage.removeItem('collapsedCategories');
+                
+                // Reset application state
+                transactions = [];
+                goals = [];
+                userProfile = { level: 1, xp: 0, savingsStreak: 0, lastContributionDate: null, lastSubscriptionReview: null, wizardCompleted: false };
+                collapsedCategories = {};
+                
+                // Close the reset modal
+                toggleModal(resetAllModal, false);
+                toggleMenu(false);
+                
+                // Show success message
+                showToast('All data has been reset successfully!', 'success');
+                
+                // Start the wizard after a short delay
+                setTimeout(() => {
+                    showWizard();
+                }, 1000);
             };
 
             // --- GAMIFICATION LOGIC ---
@@ -1855,6 +1920,34 @@
             document.getElementById('planning-wizard-menu-btn').addEventListener('click', () => {
                 toggleMenu(false);
                 showWizard();
+            });
+
+            // Reset All functionality
+            document.getElementById('reset-all-menu-btn').addEventListener('click', () => {
+                toggleMenu(false);
+                toggleModal(resetAllModal, true);
+                resetConfirmationInput.value = '';
+                confirmResetBtn.disabled = true;
+            });
+
+            // Enable/disable the confirm button based on input
+            resetConfirmationInput.addEventListener('input', (e) => {
+                const isMatch = e.target.value.toLowerCase() === 'reset';
+                confirmResetBtn.disabled = !isMatch;
+            });
+
+            // Handle reset confirmation
+            confirmResetBtn.addEventListener('click', () => {
+                if (resetConfirmationInput.value.toLowerCase() === 'reset') {
+                    resetAllData();
+                }
+            });
+
+            // Handle reset cancellation
+            cancelResetBtn.addEventListener('click', () => {
+                toggleModal(resetAllModal, false);
+                resetConfirmationInput.value = '';
+                confirmResetBtn.disabled = true;
             });
 
             // Children counter buttons
