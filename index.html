@@ -498,26 +498,14 @@
                             </div>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-2">Do you have children?</label>
-                            <div class="grid grid-cols-3 gap-3">
-                                <label class="cursor-pointer">
-                                    <input type="radio" name="children" value="none" class="hidden wizard-radio">
-                                    <div class="wizard-option p-3 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-colors text-center">
-                                        <div class="text-white font-medium">No children</div>
-                                    </div>
-                                </label>
-                                <label class="cursor-pointer">
-                                    <input type="radio" name="children" value="1-2" class="hidden wizard-radio">
-                                    <div class="wizard-option p-3 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-colors text-center">
-                                        <div class="text-white font-medium">1-2 children</div>
-                                    </div>
-                                </label>
-                                <label class="cursor-pointer">
-                                    <input type="radio" name="children" value="3+" class="hidden wizard-radio">
-                                    <div class="wizard-option p-3 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-colors text-center">
-                                        <div class="text-white font-medium">3+ children</div>
-                                    </div>
-                                </label>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">How many children do you have?</label>
+                            <div class="flex items-center gap-3">
+                                <div class="flex items-center bg-gray-700 rounded-lg border-2 border-gray-600 focus-within:border-blue-500 transition-colors">
+                                    <button type="button" id="children-minus" class="px-3 py-2 text-white hover:bg-gray-600 rounded-l-lg">-</button>
+                                    <input type="number" id="children-count" name="children" value="0" min="0" max="20" class="w-16 text-center bg-transparent text-white border-none outline-none">
+                                    <button type="button" id="children-plus" class="px-3 py-2 text-white hover:bg-gray-600 rounded-r-lg">+</button>
+                                </div>
+                                <span class="text-gray-300 text-sm">children</span>
                             </div>
                         </div>
                     </div>
@@ -620,6 +608,43 @@
                                 </label>
                             </div>
                         </div>
+                        <div id="rural-questions" class="space-y-4 hidden">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Do you have a well (no city water)?</label>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="water-source" value="city" class="hidden wizard-radio">
+                                        <div class="wizard-option p-4 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-colors text-center">
+                                            <div class="text-white font-medium">City water/sewer</div>
+                                        </div>
+                                    </label>
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="water-source" value="well" class="hidden wizard-radio">
+                                        <div class="wizard-option p-4 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-colors text-center">
+                                            <div class="text-white font-medium">Well/septic</div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-300 mb-2">Do you have farm animals?</label>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="farm-animals" value="none" class="hidden wizard-radio">
+                                        <div class="wizard-option p-4 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-colors text-center">
+                                            <div class="text-white font-medium">No farm animals</div>
+                                        </div>
+                                    </label>
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="farm-animals" value="yes" class="hidden wizard-radio">
+                                        <div class="wizard-option p-4 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-colors">
+                                            <i data-lucide="cow" class="w-6 h-6 mb-2 mx-auto text-blue-400"></i>
+                                            <div class="text-center text-white font-medium">Yes, I have livestock</div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -628,21 +653,63 @@
                     <h3 class="text-xl font-semibold text-white mb-4">Lifestyle preferences</h3>
                     <div class="space-y-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-2">Do you have pets?</label>
-                            <div class="grid grid-cols-2 gap-3">
-                                <label class="cursor-pointer">
-                                    <input type="radio" name="pets" value="none" class="hidden wizard-radio">
-                                    <div class="wizard-option p-4 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-colors text-center">
-                                        <div class="text-white font-medium">No pets</div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">What indoor pets do you have?</label>
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between bg-gray-700 rounded-lg p-3">
+                                    <div class="flex items-center gap-2">
+                                        <i data-lucide="dog" class="w-5 h-5 text-blue-400"></i>
+                                        <span class="text-white">Dogs</span>
                                     </div>
-                                </label>
-                                <label class="cursor-pointer">
-                                    <input type="radio" name="pets" value="yes" class="hidden wizard-radio">
-                                    <div class="wizard-option p-4 rounded-lg border-2 border-gray-600 hover:border-blue-500 transition-colors">
-                                        <i data-lucide="heart" class="w-6 h-6 mb-2 mx-auto text-blue-400"></i>
-                                        <div class="text-center text-white font-medium">Yes, I have pets</div>
+                                    <div class="flex items-center gap-2">
+                                        <button type="button" class="pet-minus px-2 py-1 text-white hover:bg-gray-600 rounded" data-pet="dogs">-</button>
+                                        <input type="number" id="pet-dogs" name="pet-dogs" value="0" min="0" max="10" class="w-12 text-center bg-gray-600 text-white border-none rounded">
+                                        <button type="button" class="pet-plus px-2 py-1 text-white hover:bg-gray-600 rounded" data-pet="dogs">+</button>
                                     </div>
-                                </label>
+                                </div>
+                                <div class="flex items-center justify-between bg-gray-700 rounded-lg p-3">
+                                    <div class="flex items-center gap-2">
+                                        <i data-lucide="cat" class="w-5 h-5 text-blue-400"></i>
+                                        <span class="text-white">Cats</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <button type="button" class="pet-minus px-2 py-1 text-white hover:bg-gray-600 rounded" data-pet="cats">-</button>
+                                        <input type="number" id="pet-cats" name="pet-cats" value="0" min="0" max="10" class="w-12 text-center bg-gray-600 text-white border-none rounded">
+                                        <button type="button" class="pet-plus px-2 py-1 text-white hover:bg-gray-600 rounded" data-pet="cats">+</button>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between bg-gray-700 rounded-lg p-3">
+                                    <div class="flex items-center gap-2">
+                                        <i data-lucide="bird" class="w-5 h-5 text-blue-400"></i>
+                                        <span class="text-white">Birds</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <button type="button" class="pet-minus px-2 py-1 text-white hover:bg-gray-600 rounded" data-pet="birds">-</button>
+                                        <input type="number" id="pet-birds" name="pet-birds" value="0" min="0" max="20" class="w-12 text-center bg-gray-600 text-white border-none rounded">
+                                        <button type="button" class="pet-plus px-2 py-1 text-white hover:bg-gray-600 rounded" data-pet="birds">+</button>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between bg-gray-700 rounded-lg p-3">
+                                    <div class="flex items-center gap-2">
+                                        <i data-lucide="fish" class="w-5 h-5 text-blue-400"></i>
+                                        <span class="text-white">Fish</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <button type="button" class="pet-minus px-2 py-1 text-white hover:bg-gray-600 rounded" data-pet="fish">-</button>
+                                        <input type="number" id="pet-fish" name="pet-fish" value="0" min="0" max="50" class="w-12 text-center bg-gray-600 text-white border-none rounded">
+                                        <button type="button" class="pet-plus px-2 py-1 text-white hover:bg-gray-600 rounded" data-pet="fish">+</button>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between bg-gray-700 rounded-lg p-3">
+                                    <div class="flex items-center gap-2">
+                                        <i data-lucide="rabbit" class="w-5 h-5 text-blue-400"></i>
+                                        <span class="text-white">Other pets</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <button type="button" class="pet-minus px-2 py-1 text-white hover:bg-gray-600 rounded" data-pet="other">-</button>
+                                        <input type="number" id="pet-other" name="pet-other" value="0" min="0" max="20" class="w-12 text-center bg-gray-600 text-white border-none rounded">
+                                        <button type="button" class="pet-plus px-2 py-1 text-white hover:bg-gray-600 rounded" data-pet="other">+</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div>
@@ -954,15 +1021,31 @@
                 
                 if (currentStep === 1) {
                     wizardData.relationship = document.querySelector('input[name="relationship"]:checked')?.value;
-                    wizardData.children = document.querySelector('input[name="children"]:checked')?.value;
+                    wizardData.children = document.getElementById('children-count')?.value || '0';
                 } else if (currentStep === 2) {
                     wizardData.incomeRange = document.querySelector('input[name="income-range"]:checked')?.value;
                     wizardData.workArrangement = document.querySelector('input[name="work-arrangement"]:checked')?.value;
                 } else if (currentStep === 3) {
                     wizardData.housing = document.querySelector('input[name="housing"]:checked')?.value;
                     wizardData.location = document.querySelector('input[name="location"]:checked')?.value;
+                    wizardData.waterSource = document.querySelector('input[name="water-source"]:checked')?.value;
+                    wizardData.farmAnimals = document.querySelector('input[name="farm-animals"]:checked')?.value;
                 } else if (currentStep === 4) {
-                    wizardData.pets = document.querySelector('input[name="pets"]:checked')?.value;
+                    // Collect pet data
+                    const petDogs = parseInt(document.getElementById('pet-dogs')?.value) || 0;
+                    const petCats = parseInt(document.getElementById('pet-cats')?.value) || 0;
+                    const petBirds = parseInt(document.getElementById('pet-birds')?.value) || 0;
+                    const petFish = parseInt(document.getElementById('pet-fish')?.value) || 0;
+                    const petOther = parseInt(document.getElementById('pet-other')?.value) || 0;
+                    
+                    wizardData.pets = {
+                        dogs: petDogs,
+                        cats: petCats,
+                        birds: petBirds,
+                        fish: petFish,
+                        other: petOther,
+                        total: petDogs + petCats + petBirds + petFish + petOther
+                    };
                     wizardData.workFromHome = document.querySelector('input[name="work-from-home"]:checked')?.value;
                 } else if (currentStep === 5) {
                     wizardData.priority = document.querySelector('input[name="priority"]:checked')?.value;
@@ -1043,8 +1126,10 @@
                 // Groceries based on family size
                 let groceryMultiplier = 1;
                 if (data.relationship === 'married') groceryMultiplier += 0.7;
-                if (data.children === '1-2') groceryMultiplier += 0.8;
-                if (data.children === '3+') groceryMultiplier += 1.5;
+                const childrenCount = parseInt(data.children) || 0;
+                if (childrenCount > 0) {
+                    groceryMultiplier += Math.min(childrenCount * 0.4, 2.0); // Max 2.0 increase for children
+                }
                 const groceries = Math.round(300 * groceryMultiplier);
                 recommendations.push({
                     icon: 'shopping-cart',
@@ -1052,10 +1137,17 @@
                 });
                 
                 // Pet expenses
-                if (data.pets === 'yes') {
+                if (data.pets && data.pets.total > 0) {
+                    let petExpenses = 0;
+                    petExpenses += data.pets.dogs * 60; // $60 per dog
+                    petExpenses += data.pets.cats * 40; // $40 per cat
+                    petExpenses += data.pets.birds * 15; // $15 per bird
+                    petExpenses += data.pets.fish * 5; // $5 per fish
+                    petExpenses += data.pets.other * 30; // $30 per other pet
+                    
                     recommendations.push({
                         icon: 'heart',
-                        text: `Pet expenses (food, vet, etc.) ~$100`
+                        text: `Pet expenses (${data.pets.total} pets) ~$${petExpenses}`
                     });
                 }
                 
@@ -1175,15 +1267,18 @@
                     category: 'utilities'
                 });
                 
-                transactions.push({
-                    id: Date.now() + 5,
-                    type: 'bill',
-                    description: 'Water/Sewer',
-                    amount: Math.round(40 * utilityMultiplier),
-                    date: currentMonth,
-                    paid: false,
-                    category: 'utilities'
-                });
+                // Water/Sewer (only for city water users)
+                if (data.waterSource !== 'well') {
+                    transactions.push({
+                        id: Date.now() + 5,
+                        type: 'bill',
+                        description: 'Water/Sewer',
+                        amount: Math.round(40 * utilityMultiplier),
+                        date: currentMonth,
+                        paid: false,
+                        category: 'utilities'
+                    });
+                }
                 
                 // Internet
                 const internetCost = data.workFromHome === 'always' ? 80 : 50;
@@ -1226,8 +1321,10 @@
                 // Groceries
                 let groceryMultiplier = 1;
                 if (data.relationship === 'married') groceryMultiplier += 0.7;
-                if (data.children === '1-2') groceryMultiplier += 0.8;
-                if (data.children === '3+') groceryMultiplier += 1.5;
+                const childrenCount = parseInt(data.children) || 0;
+                if (childrenCount > 0) {
+                    groceryMultiplier += Math.min(childrenCount * 0.4, 2.0); // Max 2.0 increase for children
+                }
                 const groceries = Math.round(300 * groceryMultiplier);
                 transactions.push({
                     id: Date.now() + 9,
@@ -1239,16 +1336,36 @@
                     category: 'food'
                 });
                 
-                // Pet expenses
-                if (data.pets === 'yes') {
+                // Pet expenses based on specific pets
+                if (data.pets && data.pets.total > 0) {
+                    let petExpenses = 0;
+                    petExpenses += data.pets.dogs * 60; // $60 per dog (food, vet, etc.)
+                    petExpenses += data.pets.cats * 40; // $40 per cat
+                    petExpenses += data.pets.birds * 15; // $15 per bird
+                    petExpenses += data.pets.fish * 5; // $5 per fish
+                    petExpenses += data.pets.other * 30; // $30 per other pet
+                    
                     transactions.push({
                         id: Date.now() + 10,
                         type: 'bill',
                         description: 'Pet Expenses',
-                        amount: 100,
+                        amount: petExpenses,
                         date: currentMonth,
                         paid: false,
                         category: 'pets'
+                    });
+                }
+                
+                // Farm animal expenses
+                if (data.farmAnimals === 'yes') {
+                    transactions.push({
+                        id: Date.now() + 11,
+                        type: 'bill',
+                        description: 'Livestock/Farm Animal Care',
+                        amount: 150,
+                        date: currentMonth,
+                        paid: false,
+                        category: 'farm'
                     });
                 }
                 
@@ -1738,6 +1855,59 @@
             document.getElementById('planning-wizard-menu-btn').addEventListener('click', () => {
                 toggleMenu(false);
                 showWizard();
+            });
+
+            // Children counter buttons
+            document.getElementById('children-plus').addEventListener('click', () => {
+                const input = document.getElementById('children-count');
+                const current = parseInt(input.value) || 0;
+                if (current < 20) {
+                    input.value = current + 1;
+                }
+            });
+
+            document.getElementById('children-minus').addEventListener('click', () => {
+                const input = document.getElementById('children-count');
+                const current = parseInt(input.value) || 0;
+                if (current > 0) {
+                    input.value = current - 1;
+                }
+            });
+
+            // Location change handler to show/hide rural questions
+            document.addEventListener('change', (e) => {
+                if (e.target.name === 'location') {
+                    const ruralQuestions = document.getElementById('rural-questions');
+                    if (e.target.value === 'suburban') {
+                        ruralQuestions.classList.remove('hidden');
+                    } else {
+                        ruralQuestions.classList.add('hidden');
+                        // Reset rural question values
+                        document.querySelectorAll('#rural-questions input[type="radio"]').forEach(radio => {
+                            radio.checked = false;
+                        });
+                    }
+                }
+            });
+
+            // Pet counter buttons
+            document.addEventListener('click', (e) => {
+                if (e.target.classList.contains('pet-plus')) {
+                    const petType = e.target.dataset.pet;
+                    const input = document.getElementById(`pet-${petType}`);
+                    const current = parseInt(input.value) || 0;
+                    const max = parseInt(input.max) || 10;
+                    if (current < max) {
+                        input.value = current + 1;
+                    }
+                } else if (e.target.classList.contains('pet-minus')) {
+                    const petType = e.target.dataset.pet;
+                    const input = document.getElementById(`pet-${petType}`);
+                    const current = parseInt(input.value) || 0;
+                    if (current > 0) {
+                        input.value = current - 1;
+                    }
+                }
             });
 
             // --- INITIALIZATION ---
