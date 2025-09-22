@@ -110,35 +110,106 @@
         @media (max-width: 640px) {
             .grid-mobile-fix {
                 grid-template-columns: 1fr;
-                gap: 0.75rem;
+                gap: 1rem; /* Increased from 0.75rem */
             }
         }
         @media (max-width: 1024px) {
             .grid-mobile-fix {
                 grid-template-columns: 1fr;
+                gap: 1rem; /* Increased from 0.75rem */
+            }
+        }
+        
+        /* Mobile spacing improvements */
+        @media (max-width: 640px) {
+            /* Wizard step spacing improvements */
+            .wizard-step .space-y-4 > * + * {
+                margin-top: 1.5rem; /* Increased spacing between wizard elements */
+            }
+            
+            /* Wizard option spacing */
+            .wizard-option {
+                padding: 1rem; /* More generous padding */
+                margin-bottom: 0.5rem;
+            }
+            
+            /* Grid spacing for wizard options */
+            .grid.gap-3 {
                 gap: 0.75rem;
             }
-
+            
+            /* Button spacing improvements */
+            .flex.gap-3 {
+                gap: 0.75rem;
+            }
+            
+            /* Form element spacing */
+            .space-y-2 > * + * {
+                margin-top: 0.75rem; /* Increased from 0.5rem */
+            }
+            
+            /* Pet selector spacing */
+            .bg-gray-700.rounded-lg.p-3 {
+                padding: 1rem;
+                margin-bottom: 0.75rem;
+            }
+            
+            /* Improve button height consistency */
+            button:not(.pet-minus):not(.pet-plus) {
+                min-height: 2.75rem; /* 44px minimum touch target */
+                padding-top: 0.75rem;
+                padding-bottom: 0.75rem;
+            }
+            
+            /* Pet control buttons */
+            .pet-minus, .pet-plus {
+                min-height: 2.5rem;
+                min-width: 2.5rem;
+                padding: 0.5rem;
+            }
         }
-        /* Mobile navigation optimizations for 375px and smaller screens */
+        /* Mobile navigation optimizations for 425px and smaller screens */
         @media (max-width: 425px) {
             /* Bottom navigation mobile optimization */
+            footer nav {
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
+                height: 4.5rem; /* Increased from h-20 (5rem) to give more breathing room */
+            }
+            footer nav button {
+                padding: 0.75rem 0.25rem;
+                min-width: 0;
+                flex: 1;
+                max-width: none;
+            }
+            footer nav button i {
+                width: 1.25rem;
+                height: 1.25rem;
+                margin-bottom: 0.25rem;
+            }
+            footer nav button span {
+                font-size: 0.625rem;
+                line-height: 0.75rem;
+                font-weight: 500;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 100%;
+            }
+        }
+        
+        /* Additional mobile improvements for very small screens */
+        @media (max-width: 375px) {
             footer nav {
                 padding-left: 0.25rem;
                 padding-right: 0.25rem;
             }
             footer nav button {
-                padding-left: 0.5rem;
-                padding-right: 0.5rem;
-                min-width: 0;
-            }
-            footer nav button i {
-                width: 1.25rem;
-                height: 1.25rem;
+                padding: 0.5rem 0.125rem;
             }
             footer nav button span {
-                font-size: 0.6rem;
-                line-height: 0.75rem;
+                font-size: 0.5rem;
+                line-height: 0.625rem;
             }
         }
     </style>
@@ -347,12 +418,12 @@
 
         <!-- Bottom Navigation -->
         <footer class="fixed bottom-0 left-0 right-0 bg-gray-800/80 backdrop-blur-sm border-t border-gray-700 z-40">
-             <nav class="max-w-3xl mx-auto flex justify-around items-center h-20  px-2 overflow-x-hidden">
-                <button id="overview-view-btn" class="flex flex-col items-center text-blue-400 font-semibold px-4 py-2"><i data-lucide="layout-grid" class="w-6 h-6 mb-1"></i><span class="text-xs" style="font-size: 0.75rem;">Overview</span></button>
-                <button id="monthly-view-btn" class="flex flex-col items-center text-gray-400 hover:text-white transition-colors px-4 py-2"><i data-lucide="wallet" class="w-6 h-6 mb-1"></i><span class="text-xs" style="font-size: 0.75rem;">Monthly</span></button>
-                <button id="goals-view-btn" class="flex flex-col items-center text-gray-400 hover:text-white transition-colors px-4 py-2"><i data-lucide="target" class="w-6 h-6 mb-1"></i><span class="text-xs" style="font-size: 0.75rem;">Goals</span></button>
-                <button id="planning-view-btn" class="flex flex-col items-center text-gray-400 hover:text-white transition-colors px-4 py-2"><i data-lucide="sliders-horizontal" class="w-6 h-6 mb-1"></i><span class="text-xs" style="font-size: 0.75rem;">Planner</span></button>
-                <button id="yearly-view-btn" class="flex flex-col items-center text-gray-400 hover:text-white transition-colors px-4 py-2"><i data-lucide="calendar-days" class="w-6 h-6 mb-1"></i><span class="text-xs" style="font-size: 0.75rem;">Yearly</span></button>
+             <nav class="max-w-3xl mx-auto flex justify-around items-center h-20 sm:h-20 px-2 overflow-x-hidden">
+                <button id="overview-view-btn" class="flex flex-col items-center text-blue-400 font-semibold px-2 sm:px-4 py-2"><i data-lucide="layout-grid" class="w-5 h-5 sm:w-6 sm:h-6 mb-1"></i><span class="text-xs">Overview</span></button>
+                <button id="monthly-view-btn" class="flex flex-col items-center text-gray-400 hover:text-white transition-colors px-2 sm:px-4 py-2"><i data-lucide="wallet" class="w-5 h-5 sm:w-6 sm:h-6 mb-1"></i><span class="text-xs">Monthly</span></button>
+                <button id="goals-view-btn" class="flex flex-col items-center text-gray-400 hover:text-white transition-colors px-2 sm:px-4 py-2"><i data-lucide="target" class="w-5 h-5 sm:w-6 sm:h-6 mb-1"></i><span class="text-xs">Goals</span></button>
+                <button id="planning-view-btn" class="flex flex-col items-center text-gray-400 hover:text-white transition-colors px-2 sm:px-4 py-2"><i data-lucide="sliders-horizontal" class="w-5 h-5 sm:w-6 sm:h-6 mb-1"></i><span class="text-xs">Planner</span></button>
+                <button id="yearly-view-btn" class="flex flex-col items-center text-gray-400 hover:text-white transition-colors px-2 sm:px-4 py-2"><i data-lucide="calendar-days" class="w-5 h-5 sm:w-6 sm:h-6 mb-1"></i><span class="text-xs">Yearly</span></button>
             </nav>
         </footer>
     </div>
